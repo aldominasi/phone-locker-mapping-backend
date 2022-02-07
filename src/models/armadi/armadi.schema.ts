@@ -31,3 +31,4 @@ const armadiSchema: Schema = new Schema<IArmadi>({
 });
 
 export default model<IArmadi>('armadi', armadiSchema);
+
