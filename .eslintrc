@@ -16,6 +16,9 @@
     "camelcase": "error",
     "no-const-assign": "error",
     "no-dupe-keys": "warn",
-    "no-duplicate-imports": "warn"
+    "no-duplicate-imports": "warn",
+    "indent": [2, 2, {"SwitchCase":  1}],
+    "eol-last": "error",
+    "semi": "error"
   }
 }
