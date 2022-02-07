@@ -19,6 +19,7 @@
     "no-duplicate-imports": "warn",
     "indent": [2, 2, {"SwitchCase":  1}],
     "eol-last": "error",
-    "semi": "error"
+    "semi": "off",
+    "@typescript-eslint/semi": ["error"]
   }
 }
