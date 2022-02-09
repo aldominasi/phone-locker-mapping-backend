@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } f
 import armadiSchema from '../../entities/armadi/armadi.schema';
 import IArmadi from '../../entities/armadi/armadi.interface';
 import { ResponseApi } from '../../models/ResponseApi';
+import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
 
 interface IParams {
   id: string
@@ -23,7 +24,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       return new ResponseApi(armadio);
     } catch (ex) {
       server.log.error(ex);
-      return new ResponseApi(null, false, 'Si è verificato un errore. Riprova più tardi.', 2);
+      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 2);
     }
   });
 };
