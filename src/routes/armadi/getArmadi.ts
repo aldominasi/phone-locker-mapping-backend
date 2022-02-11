@@ -4,6 +4,7 @@ import IArmadi from '../../entities/armadi/armadi.interface';
 import { ResponseApi } from '../../models/ResponseApi';
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
 import { paramsArmadi, queryArmadi } from '../../schemas/validations/getArmadi.validation';
+import { responseArmadio, responsePagination } from '../../schemas/serializations/getArmadi.serialization';
 
 interface IParams {
   id: string
@@ -26,7 +27,10 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       version: '1.0.0'
     },
     schema: {
-      params: paramsArmadi
+      params: paramsArmadi,
+      response: {
+        '200': responseArmadio
+      }
     }
   }, async (request: FastifyRequest<{ Params: IParams }>, reply: FastifyReply) => {
     try {
@@ -50,7 +54,10 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       version: '1.0.0'
     },
     schema: {
-      querystring: queryArmadi
+      querystring: queryArmadi,
+      response: {
+        '200': responsePagination
+      }
     }
   }, async (request: FastifyRequest<{ Querystring: IQuery }>, reply: FastifyReply) => {
     try {
