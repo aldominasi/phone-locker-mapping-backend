@@ -1,0 +1,7 @@
+.git
+node_modules
+README.md
+docker-compose.yml
+Dockerfile
+.idea
+conf/mongo-init.sh

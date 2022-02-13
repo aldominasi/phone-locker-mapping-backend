@@ -18,8 +18,6 @@ const ruoliSchema: Schema = new Schema<IRuoli>({
     type: Boolean,
     default: false
   }
-}, {
-  timestamps: true
 });
 
 export default model<IRuoli>('ruoli', ruoliSchema);

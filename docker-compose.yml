@@ -1,37 +1,41 @@
-version: '3.8'
+version: "3.9"
+
+volumes:
+  plm_data:
+    driver: local
+
 services:
-  plm-backend:
-    hostname: "plm"
+  web:
+    container_name: plm_service
+    image: aldominasi/plm:latest
     build: .
-    volumes:
-      - .:/usr/app/
-      - /usr/app/node_modules
     environment:
-      PORT_PLM_BACKEND: "3000"
-      HOST_DB: "127.0.0.1"
-      DB_USER: "${DB_USER}"
-      DB_PWD: "${DB_PWD}"
-      DB_NAME: "${DB_NAME}"
+      - PORT_PLM_BACKEND=${PORT_PLM_BACKEND}
+      - MONGO_DB_HOST=db
+      - DB_USER=${MONGO_INITDB_ROOT_USERNAME}
+      - DB_PWD=${MONGO_INITDB_ROOT_PASSWORD}
+      - DB_NAME=${MONGO_INITDB_DATABASE}
     depends_on:
-      - mongo
+      - db
     ports:
       - "3000:3000"
     links:
-      - mongo
-  mongo:
+      - db
+  db:
     image: mongo:5.0.5
-    container_name: mongo
+    container_name: mongodb_plm
     restart: always
     environment:
-      MONGO_DATA_DIR: "/data/db"
-      MONGO_LOG_DIR: "/dev/db/log"
-      MONGO_INITDB_DATABASE: "${DB_NAME}"
-      MONGO_INITDB_ROOT_USERNAME: "root"
-      MONGO_INITDB_ROOT_PASSWORD: "password"
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
+    command: [ "--bind_ip_all" ]
     ports:
       - "49152:27017"
     volumes:
-      - mongodb_server_data:/data/db
-      - ./docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-volumes:
-  mongodb_server_data:
+      - plm_data:/data/db
+      - ./conf/mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh
+      - ./initCollections/ruolis.json:/app/initCollections/ruolis.json
+      - ./initCollections/utentis.json:/app/initCollections/utentis.json
+    env_file:
+      - .env

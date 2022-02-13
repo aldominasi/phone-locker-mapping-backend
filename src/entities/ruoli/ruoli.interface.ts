@@ -5,6 +5,4 @@ export default interface IRuoli extends Document {
   visualizzaArmadi: boolean;
   modificaArmadi: boolean;
   creaArmadi: boolean;
-  createdAt: Date;
-  updatedAt: Date;
 }

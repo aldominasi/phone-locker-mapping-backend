@@ -1,17 +1,20 @@
 [
   {
+    "_id": {"$oid": "6209650e119aec91b09f847d"},
     "descrizione": "admin",
     "visualizzaArmadi": true,
     "modificaArmadi": true,
     "creaArmadi": true
   },
   {
+    "_id": {"$oid": "62096569482eb084d99459c8"},
     "descrizione": "operatore",
     "visualizzaArmadi": true,
     "modificaArmadi": true,
     "creaArmadi": false
   },
   {
+    "_id": {"$oid": "6209656fd5f924ff69e31003"},
     "descrizione": "limitato",
     "visualizzaArmadi": true,
     "modificaArmadi": false,
