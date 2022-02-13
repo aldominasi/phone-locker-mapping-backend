@@ -1,0 +1,20 @@
+[
+  {
+    "descrizione": "admin",
+    "visualizzaArmadi": true,
+    "modificaArmadi": true,
+    "creaArmadi": true
+  },
+  {
+    "descrizione": "operatore",
+    "visualizzaArmadi": true,
+    "modificaArmadi": true,
+    "creaArmadi": false
+  },
+  {
+    "descrizione": "limitato",
+    "visualizzaArmadi": true,
+    "modificaArmadi": false,
+    "creaArmadi": false
+  }
+]
