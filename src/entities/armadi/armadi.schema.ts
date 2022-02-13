@@ -27,6 +27,10 @@ const armadiSchema: Schema = new Schema<IArmadi>({
   indirizzo: {
     type: String,
     required: true
+  },
+  nota: {
+    type: String,
+    default: ''
   }
 });
 
