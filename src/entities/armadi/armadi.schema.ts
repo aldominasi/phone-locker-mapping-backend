@@ -32,6 +32,8 @@ const armadiSchema: Schema = new Schema<IArmadi>({
     type: String,
     default: ''
   }
+}, {
+  timestamps: true
 });
 
 export default model<IArmadi>('armadi', armadiSchema);

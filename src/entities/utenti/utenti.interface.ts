@@ -6,5 +6,7 @@ export default interface IUtenti extends Document {
   numeroCellulare: string;
   nome: string;
   cognome: string;
-  //ruolo: string;
+  ruolo: string;
+  createdAt: Date;
+  updatedAt: Date;
 }

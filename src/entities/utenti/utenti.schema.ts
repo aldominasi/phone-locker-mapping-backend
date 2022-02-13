@@ -22,6 +22,8 @@ const utentiSchema: Schema = new Schema<IUtenti>({
     type: String,
     required: true
   }
+}, {
+  timestamps: true
 });
 
 export default model<IUtenti>('utenti', utentiSchema);

@@ -10,5 +10,7 @@ export default interface IArmadi extends Document {
   tipoArmadio: string;
   indirizzo: string;
   nota: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
