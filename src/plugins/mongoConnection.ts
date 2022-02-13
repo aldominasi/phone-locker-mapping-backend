@@ -10,10 +10,16 @@ const connectToDb: FastifyPluginAsync = async function (server: FastifyInstance)
     mongoose.connection.on('disconnected',  () => {
       server.log.error('connessione al db persa');
     });
-    // TODO: CREARE UNA VARIABILE D'AMBIENTE PER LA CONNECTION STRING AL DB
-    await mongoose.connect('mongodb://127.0.0.1:27017/plmdb', {
-      autoIndex: true
-    });
+    if (process.env.DEVELOPMENT) {
+      await mongoose.connect('mongodb://127.0.0.1:27017/plmdb', {
+        autoIndex: true
+      });
+    }
+    else {
+      await mongoose.connect(`mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@mongo:27017/${process.env.DB_NAME}`, {
+        autoIndex: true
+      });
+    }
   } catch (ex) {
     server.log.error(ex);
   }

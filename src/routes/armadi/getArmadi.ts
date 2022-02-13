@@ -32,7 +32,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
         '200': responseArmadio
       }
     }
-  }, async (request: FastifyRequest<{ Params: IParams }>, reply: FastifyReply) => {
+  }, async (request: FastifyRequest<{ Params: IParams }>, reply: FastifyReply): Promise<ResponseApi> => {
     try {
       const armadio: IArmadi | null = await armadiSchema.findById(request.params.id);
       if (armadio == null) {
