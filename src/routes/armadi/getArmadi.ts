@@ -34,7 +34,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     }
   }, async (request: FastifyRequest<{ Params: IParams }>, reply: FastifyReply): Promise<ResponseApi> => {
     try {
-      const armadio: IArmadi | null = await armadiSchema.findById(request.params.id);
+      const armadio: IArmadi | null = await armadiSchema.findById(request.params.id).exec();
       if (armadio == null) {
         return new ResponseApi(null, false, 'Armadio non trovato', 2);
       }
@@ -65,7 +65,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
         .skip(request.query.page * request.query.limit)
         .limit(request.query.limit)
         .exec();
-      const countDocuments: number = await armadiSchema.countDocuments();
+      const countDocuments: number = await armadiSchema.countDocuments().exec();
       return new ResponseApi({
         documentiTotali: countDocuments,
         pagina: request.query.page,
