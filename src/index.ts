@@ -1,7 +1,8 @@
 import { fastify } from 'fastify';
 import fastifyAutoload from 'fastify-autoload';
 import path from 'path';
-const PORT: number | string = process.env.PORT_PLM_BACKEND ?? 3000; //TODO: INSERIRE LA VARIABILE D'AMBIENTE PER SETTARE LA PORTA DEL BACKEND
+import basicAuth from './utilities/basicAuth';
+const PORT: number | string = process.env.PORT_PLM_BACKEND ?? 3000;
 
 const server = fastify({
   logger: true
@@ -12,6 +13,7 @@ const start = async (): Promise<void> => {
     await server.register(fastifyAutoload, {
       dir: path.join(__dirname, 'plugins')
     });
+    await server.register(import('fastify-basic-auth'), basicAuth);
     await server.register(fastifyAutoload, {
       dir: path.join(__dirname, 'routes'),
       dirNameRoutePrefix: true
