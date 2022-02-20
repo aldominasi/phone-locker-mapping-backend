@@ -1,10 +1,10 @@
 import fp from 'fastify-plugin';
 import {FastifyInstance, FastifyPluginAsync, FastifyReply, FastifyRequest} from 'fastify';
 import MongoStore from 'connect-mongo';
-import fastifySession from '@fastify/session';
+import fastifySession from 'fastify-session';
 import { ResponseApi } from '../models/ResponseApi';
 import {sign, verify, JwtPayload, decode } from 'jsonwebtoken';
-import {type} from "os";
+import fastifyCookie from 'fastify-cookie';
 
 const keySession: string = process.env.KEY_SESSION as string;
 const seedJwt: string = process.env.SEED_JWT_TOKEN as string;
@@ -12,6 +12,7 @@ const mongoConnection: string = process.env.DEVELOPMENT ? 'mongodb://127.0.0.1:2
 
 const session: FastifyPluginAsync = async function (server: FastifyInstance) {
   try {
+    server.register(fastifyCookie);
     server.register(fastifySession, {
       cookieName: 'mycuptCookie',
       secret: keySession,

@@ -2,7 +2,8 @@ import { fastify } from 'fastify';
 import fastifyAutoload from 'fastify-autoload';
 import path from 'path';
 import basicAuth from './utilities/basicAuth';
-const PORT: number | string = process.env.PORT_PLM_BACKEND ?? 3000;
+import Env from 'fastify-env';
+import envValidation from './schemas/validations/env.validation';
 
 const server = fastify({
   logger: true
@@ -10,6 +11,18 @@ const server = fastify({
 
 const start = async (): Promise<void> => {
   try {
+    if (process.env.DEVELOPMENT)
+      await server.register(Env, {
+        dotenv: {
+          path: path.resolve(__dirname, '../.env')
+        },
+        schema: envValidation
+      });
+    else
+      await server.register(Env, {
+        schema: envValidation
+      });
+    const PORT: number | string = process.env.PORT_PLM_BACKEND ?? 3000;
     await server.register(fastifyAutoload, {
       dir: path.join(__dirname, 'plugins')
     });
