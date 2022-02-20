@@ -13,7 +13,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     constraints: {
       version: '1.0.0'
     },
-    preHandler: server.verifyAuth
+    onRequest: server.verifyAuth
   }, async (request: FastifyRequest, reply: FastifyReply): Promise<ResponseApi> => {
     try {
       const tokenData = server.getDataFromToken(request);
