@@ -4,6 +4,8 @@ import path from 'path';
 import basicAuth from './utilities/basicAuth';
 import Env from 'fastify-env';
 import envValidation from './schemas/validations/env.validation';
+import utentiSchema from './entities/utenti/utenti.schema';
+import { hash } from 'bcryptjs';
 
 const server = fastify({
   logger: true
@@ -31,6 +33,16 @@ const start = async (): Promise<void> => {
       dir: path.join(__dirname, 'routes'),
       dirNameRoutePrefix: true
     });
+    const utenteAdmin = await utentiSchema.findOne({ email: 'admin@admin.com' }).exec();
+    if (utenteAdmin == null)
+      await utentiSchema.create({
+        "email": "admin@admin.com",
+        "password": await hash('Cambiami1',8),
+        "numeroCellulare": "333098273645",
+        "nome": "admin",
+        "cognome": "admin",
+        "ruolo": "6209650e119aec91b09f847d"
+      });
     await server.listen(PORT, '0.0.0.0');
   } catch (ex) {
     server.log.error(ex);
