@@ -8,4 +8,5 @@ export default S.object()
   .prop('USERNAME_BASIC_AUTH', S.string().required())
   .prop('PASSWORD_BASIC_AUTH', S.string().required())
   .prop('KEY_SESSION', S.string().required())
+  .prop('SALT_PWD', S.integer())
   .prop('SEED_JWT_TOKEN', S.string().required());

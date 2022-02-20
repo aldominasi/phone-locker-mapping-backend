@@ -37,7 +37,7 @@ const start = async (): Promise<void> => {
     if (utenteAdmin == null)
       await utentiSchema.create({
         "email": "admin@admin.com",
-        "password": await hash('Cambiami1',8),
+        "password": await hash('Cambiami1', parseInt(process.env.SALT_PWD ?? '8')),
         "numeroCellulare": "333098273645",
         "nome": "admin",
         "cognome": "admin",
