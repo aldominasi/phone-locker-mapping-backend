@@ -4,12 +4,11 @@ import IUtenti from '../../entities/utenti/utenti.interface';
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
 import { ResponseApi } from '../../models/ResponseApi';
 import { compare } from 'bcryptjs';
-import { sign } from 'jsonwebtoken';
 import { bodyLogin } from '../../schemas/validations/login.validation';
 import { responseLogin } from '../../schemas/serializations/login.serialization';
 
 interface IBody {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -32,17 +31,28 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     }
   }, async (request: FastifyRequest<{ Body: IBody }>, reply: FastifyReply): Promise<ResponseApi> => {
     try {
-      const utente: IUtenti | null = await utentiSchema.findOne({ username: request.body.username });
+      const { email, password } = request.body;
+      const utente: IUtenti | null = await utentiSchema.findOne({ username: email });
       if (utente == null)
         return new ResponseApi(null, false, 'Username o password non corretti', 2);
-      const pwdIsCorrect: boolean = await compare(request.body.password, utente.password);
+      const pwdIsCorrect: boolean = await compare(password, utente.password);
       if (!pwdIsCorrect)
         return new ResponseApi(null, false, 'Username o password non corretti', 3);
-      const token: string = sign(utente._id, process.env.SEED_JWT_TOKEN as string);
-      return new ResponseApi(token);
+      const signIn = server.signAuth(request, {
+        id: utente._id
+      });
+      return new ResponseApi({
+        auth: signIn
+      });
     } catch (ex) {
       server.log.error(ex);
       return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 1);
     }
   });
 };
+
+declare module "jsonwebtoken" {
+  export interface JwtPayload {
+    id: string;
+  }
+}
