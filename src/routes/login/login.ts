@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
+import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import utentiSchema from '../../entities/utenti/utenti.schema';
 import IUtenti from '../../entities/utenti/utenti.interface';
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
@@ -19,7 +19,9 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
   2 - Utente non trovato
   3 - Password errata
    */
-  server.post('/', {
+  server.post<{
+    Body: IBody
+  }>('/', {
     constraints: {
       version: '1.0.0'
     },
@@ -29,7 +31,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
         200: responseLogin
       }
     }
-  }, async (request: FastifyRequest<{ Body: IBody }>, reply: FastifyReply): Promise<ResponseApi> => {
+  }, async (request, reply): Promise<ResponseApi> => {
     try {
       const { email, password } = request.body;
       const utente: IUtenti | null = await utentiSchema.findOne({ username: email });

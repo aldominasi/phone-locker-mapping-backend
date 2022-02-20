@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
+import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import armadiSchema from '../../entities/armadi/armadi.schema';
 import IArmadi from '../../entities/armadi/armadi.interface';
 import { ResponseApi } from '../../models/ResponseApi';
@@ -22,7 +22,9 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
   1 - Errore generico
   2 - Armadio non trovato
    */
-  server.get('/:id', {
+  server.get<{
+    Params: IParams
+  }>('/:id', {
     constraints: {
       version: '1.0.0'
     },
@@ -32,7 +34,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
         '200': responseArmadio
       }
     }
-  }, async (request: FastifyRequest<{ Params: IParams }>, reply: FastifyReply): Promise<ResponseApi> => {
+  }, async (request, reply): Promise<ResponseApi> => {
     try {
       const armadio: IArmadi | null = await armadiSchema.findById(request.params.id).exec();
       if (armadio == null) {
@@ -49,7 +51,9 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
   Codici di errore:
   1 - Errore generico
    */
-  server.get('/', {
+  server.get<{
+    Querystring: IQuery
+  }>('/', {
     constraints: {
       version: '1.0.0'
     },
@@ -59,7 +63,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
         '200': responsePagination
       }
     }
-  }, async (request: FastifyRequest<{ Querystring: IQuery }>, reply: FastifyReply) => {
+  }, async (request, reply) => {
     try {
       const armadi: IArmadi[] = await armadiSchema.find()
         .skip(request.query.page * request.query.limit)
