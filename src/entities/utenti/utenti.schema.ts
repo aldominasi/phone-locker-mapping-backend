@@ -6,6 +6,10 @@ const utentiSchema: Schema = new Schema<IUtenti>({
     type: String,
     required: true
   },
+  modPwdData: {
+    type: Date,
+    default: new Date()
+  },
   password: {
     type: String,
     required: true
