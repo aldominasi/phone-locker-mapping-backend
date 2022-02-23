@@ -7,12 +7,12 @@ import { paramsArmadi, queryArmadi } from '../../schemas/validations/getArmadi.v
 import { responseArmadio, responsePagination } from '../../schemas/serializations/getArmadi.serialization';
 
 interface IParams {
-  id: string
+  id: string;
 }
 
 interface IQuery {
-  page: number,
-  limit: number
+  page: number;
+  limit: number;
 }
 
 export default async (server: FastifyInstance, options: FastifyPluginOptions) => {

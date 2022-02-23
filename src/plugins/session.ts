@@ -17,10 +17,10 @@ const session: FastifyPluginAsync = async function (server: FastifyInstance) {
       cookieName: 'mycuptCookie',
       secret: keySession,
       cookie: {
-        secure: false,
+        secure: false, //TODO: in produzione utilizzare il valore true
         maxAge: 900000
-      }, //TODO: in produzione utilizzare il valore true
-      saveUninitialized: false,
+      },
+      saveUninitialized: true,
       store: new MongoStore({
         mongoUrl: mongoConnection,
       })
@@ -41,9 +41,9 @@ const session: FastifyPluginAsync = async function (server: FastifyInstance) {
 
 async function verifyAuth (request: FastifyRequest, reply: FastifyReply): Promise<void> {
   try {
-    if (!request.session.authenticated)
+    if (!request.session.user.authenticated)
       return reply.status(200).send(new ResponseApi(null, false, 'Accesso non consentito', 1));
-    const resultVerify: string | JwtPayload = verify(request.session.token, seedJwt, {
+    verify(request.session.user.token, seedJwt, {
       ignoreExpiration: false
     });
   } catch (ex) {
@@ -55,8 +55,10 @@ async function verifyAuth (request: FastifyRequest, reply: FastifyReply): Promis
 function signAuth(request: FastifyRequest, data: JwtPayload): boolean {
   try {
     const token: string = sign(data, process.env.SEED_JWT_TOKEN as string);
-    request.session.authenticated = true;
-    request.session.token = token;
+    request.session.user = {
+      authenticated: true,
+      token: token
+    };
     return true;
   } catch (ex) {
     console.error(ex);
@@ -70,18 +72,23 @@ function signAuth(request: FastifyRequest, data: JwtPayload): boolean {
  */
 function getDataFromToken(request: FastifyRequest): null | JwtPayload {
   try {
-    return decode(request.session.token) as null | JwtPayload;
+    return decode(request.session.user.token) as null | JwtPayload;
   } catch (ex) {
     console.error(ex);
     return null;
   }
 }
 
-declare module "fastify" {
+declare module "fastify-session" {
   export interface Session {
-    token: string;
-    authenticated: boolean;
+    user: {
+      authenticated: boolean;
+      token: string;
+    }
   }
+}
+
+declare module "fastify" {
   export interface FastifyInstance {
     signAuth: (request: FastifyRequest, data: JwtPayload) => boolean;
     verifyAuth: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
