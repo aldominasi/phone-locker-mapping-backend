@@ -16,7 +16,6 @@ const connectToDb: FastifyPluginAsync = async function (server: FastifyInstance)
       });
     }
     else {
-      //console.log(`mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@${process.env.HOST_DB}/${process.env.DB_NAME}?authSource=admin`);
       await mongoose.connect(`mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@${process.env.MONGO_DB_HOST}/${process.env.DB_NAME}?authSource=admin`, {
         autoIndex: true
       });
