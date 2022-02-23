@@ -27,9 +27,9 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       version: '1.0.0'
     },
     schema: {
-      body: bodyLogin,
+      body: bodyLogin, // Validazione del body
       response: {
-        200: responseLogin
+        200: responseLogin // Serializzazione della risposta
       }
     }
   }, async (request, reply): Promise<ResponseApi> => {
