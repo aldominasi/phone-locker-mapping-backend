@@ -36,6 +36,5 @@ services:
       - plm_data:/data/db
       - ./conf/mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh
       - ./initCollections/ruolis.json:/app/initCollections/ruolis.json
-      - ./initCollections/utentis.json:/app/initCollections/utentis.json
     env_file:
       - .env

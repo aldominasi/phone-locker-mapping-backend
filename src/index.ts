@@ -33,6 +33,16 @@ const start = async (): Promise<void> => {
       dir: path.join(__dirname, 'routes'),
       dirNameRoutePrefix: true
     });
+    const utenteAdmin = await utentiSchema.findOne({ email: 'admin@admin.com' }).exec();
+    if (utenteAdmin == null)
+      await utentiSchema.create({
+        "email": "admin@admin.com",
+        "password": await hash('Cambiami1', parseInt(process.env.SALT_PWD ?? '8')),
+        "numeroCellulare": "333098273645",
+        "nome": "admin",
+        "cognome": "admin",
+        "ruolo": "6209650e119aec91b09f847d"
+      });
     await server.listen(PORT, '0.0.0.0');
   } catch (ex) {
     server.log.error(ex);
