@@ -12,16 +12,16 @@ const mongoConnection: string = process.env.DEVELOPMENT ? 'mongodb://127.0.0.1:2
 
 const session: FastifyPluginAsync = async function (server: FastifyInstance) {
   try {
-    server.register(fastifyCookie);
-    server.register(fastifySession, {
-      cookieName: 'mycuptCookie',
-      secret: keySession,
-      cookie: {
+    server.register(fastifyCookie); // Registra il plugin fastifyCookie
+    server.register(fastifySession, { // Registra il plugin fastifySession
+      cookieName: 'mycuptCookie', // Nome del cookie
+      secret: keySession, // Secret per generare l'ID della sessione
+      cookie: { // Opzioni per la gestione dei cookie
         secure: false, //TODO: in produzione utilizzare il valore true
         maxAge: 900000
       },
       saveUninitialized: true,
-      store: new MongoStore({
+      store: new MongoStore({ // Utilizza il database mongo per gestire la sessione
         mongoUrl: mongoConnection,
       })
     });
@@ -41,7 +41,7 @@ const session: FastifyPluginAsync = async function (server: FastifyInstance) {
 
 async function verifyAuth (request: FastifyRequest, reply: FastifyReply): Promise<void> {
   try {
-    if (!request.session.user.authenticated)
+    if (!request.session.user.authenticated) // Controlla il campo authenticated che viene settato a true all'atto della login
       return reply.status(200).send(new ResponseApi(null, false, 'Accesso non consentito', 1));
     verify(request.session.user.token, seedJwt, {
       ignoreExpiration: false
@@ -51,6 +51,12 @@ async function verifyAuth (request: FastifyRequest, reply: FastifyReply): Promis
     return reply.status(200).send(new ResponseApi(null, false, 'Il servio non è al momento disponibile', 2));
   }
 }
+
+/**
+ * Esegue la firma del token jwt e salva i dati in sessione
+ * @param request FastifyInstance
+ * @param data Informazioni da includere nel token jwt
+ */
 
 function signAuth(request: FastifyRequest, data: JwtPayload): boolean {
   try {
@@ -67,7 +73,7 @@ function signAuth(request: FastifyRequest, data: JwtPayload): boolean {
 }
 
 /**
- *
+ * Recupera i dati dal token jwt presente in sessione
  * @param request FastifyRequest
  */
 function getDataFromToken(request: FastifyRequest): null | JwtPayload {
