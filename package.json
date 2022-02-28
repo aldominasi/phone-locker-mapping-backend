@@ -35,7 +35,8 @@
     "fastify-session": "^5.2.1",
     "connect-mongo": "^4.6.0",
     "express-session": "^1.17.2",
-    "fastify-cookie": "^5.5.0"
+    "fastify-cookie": "^5.5.0",
+    "fastify-cors": "^6.0.3"
   },
   "devDependencies": {
     "@types/express-session": "^1.17.4",
