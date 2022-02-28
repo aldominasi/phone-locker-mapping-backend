@@ -20,4 +20,4 @@ export const responsePagination = responseApiSerialization
     .prop('pagina', S.integer())
     .prop('documentiPagina', S.integer())
     .prop('armadi', S.array().items(armadio))
-  );
+  ).raw({ nullable: true });

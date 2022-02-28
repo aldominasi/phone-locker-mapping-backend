@@ -41,7 +41,7 @@ const session: FastifyPluginAsync = async function (server: FastifyInstance) {
 
 async function verifyAuth (request: FastifyRequest, reply: FastifyReply): Promise<void> {
   try {
-    if (!request.session.user.authenticated) // Controlla il campo authenticated che viene settato a true all'atto della login
+    if (request.session.user == null || !request.session.user.authenticated) // Controlla il campo authenticated che viene settato a true all'atto della login
       return reply.status(200).send(new ResponseApi(null, false, 'Accesso non consentito', 1));
     verify(request.session.user.token, seedJwt, {
       ignoreExpiration: false
