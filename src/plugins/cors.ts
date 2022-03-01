@@ -1,19 +1,19 @@
 import fp from 'fastify-plugin';
-import fastifyCors from 'fastify-cors';
+import fastifyCors, { FastifyCorsOptions } from 'fastify-cors';
 import { FastifyInstance, FastifyPluginAsync } from 'fastify';
 
 const corsAllowed: FastifyPluginAsync = async function (server: FastifyInstance) {
   try {
     server.register(fastifyCors, () => {
       return (req, cb) => {
-        let corsOptions = { origin: false };
+        let corsOptions: FastifyCorsOptions = { origin: false, credentials: false };
         const origin: string | undefined = req.headers.origin;
         if (origin == null) {
           return cb(null, corsOptions);
         }
         const hostname = new URL(origin).hostname;
         if (hostname === "localhost")
-          corsOptions = {origin: true};
+          corsOptions = { origin: true, credentials: true };
         cb(null, corsOptions);
       };
     });
