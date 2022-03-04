@@ -3,6 +3,7 @@ import utentiSchema from '../../entities/utenti/utenti.schema';
 import IUtenti from '../../entities/utenti/utenti.interface';
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
 import { ResponseApi } from "../../models/ResponseApi";
+import { IQuerystringJwt } from "../../plugins/jwtHandler";
 
 export default async (server: FastifyInstance, options: FastifyPluginOptions) => {
   /*
@@ -14,14 +15,16 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
   4 - Utente non trovato
   5 - Errore generico
    */
-  server.get('/me', {
+  server.get<{
+    Querystring: IQuerystringJwt
+  }>('/me', {
     constraints: {
       version: '1.0.0' // Header Accept-Version
     },
-    preHandler: server.verifyAuth // Verifica la sessione dell'utenza
-  }, async (request: FastifyRequest, reply: FastifyReply): Promise<ResponseApi> => {
+    onRequest: server.verifyAuth // Verifica la sessione dell'utenza
+  }, async (request, reply: FastifyReply): Promise<ResponseApi> => {
     try {
-      const tokenData = server.getDataFromToken(request); // Recupera le informazioni contenute nel token jwt
+      const tokenData = server.getDataFromToken(request.query.token); // Recupera le informazioni contenute nel token jwt
       if (tokenData == null) // Informazioni non recuperate
         return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 3);
       const utente: null | IUtenti = await utentiSchema.findById(tokenData.id, {_id: 0, password: 0}).exec(); // Recupera l'utente

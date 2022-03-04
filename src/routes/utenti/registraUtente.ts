@@ -4,6 +4,7 @@ import IUtenti from '../../entities/utenti/utenti.interface';
 import { ResponseApi } from "../../models/ResponseApi";
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
 import { hash } from 'bcryptjs';
+import {IQuerystringJwt} from "../../plugins/jwtHandler";
 
 export default async (server: FastifyInstance, options: FastifyPluginOptions) => {
   /*
@@ -14,6 +15,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
   3 - Errore generico
    */
   server.post<{
+    Querystring: IQuerystringJwt,
     Body: IUtenti
   }>('/', {
     constraints: {

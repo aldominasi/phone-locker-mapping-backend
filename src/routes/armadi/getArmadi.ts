@@ -5,12 +5,13 @@ import { ResponseApi } from '../../models/ResponseApi';
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
 import { paramsArmadi, queryArmadi } from '../../schemas/validations/getArmadi.validation';
 import { responseArmadio, responsePagination } from '../../schemas/serializations/getArmadi.serialization';
+import { IQuerystringJwt } from '../../plugins/jwtHandler';
 
 interface IParams { // Interfaccia params della request
   id: string; // id dell'armadio
 }
 
-interface IQuery { // Interfaccia delle querystring della request
+interface IQuery extends IQuerystringJwt { // Interfaccia delle querystring della request
   page: number; // numero di pagina
   limit: number; // numero di item per pagina
 }
@@ -25,6 +26,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
   4 - Errore generico
    */
   server.get<{
+    Querystring: IQuerystringJwt,
     Params: IParams
   }>('/:id', {
     constraints: {
