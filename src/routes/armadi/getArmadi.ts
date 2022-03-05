@@ -14,6 +14,11 @@ interface IParams { // Interfaccia params della request
 interface IQuery extends IQuerystringJwt { // Interfaccia delle querystring della request
   page: number; // numero di pagina
   limit: number; // numero di item per pagina
+  centrale?: string; // filtro per la ricerca (nome della centrale)
+}
+
+interface IFiltroRicerca {
+  centrale?: string;
 }
 
 export default async (server: FastifyInstance, options: FastifyPluginOptions) => {
@@ -71,12 +76,15 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     preHandler: server.verifyAuth // Verifica la sessione dell'utenza
   }, async (request, reply): Promise<ResponseApi> => {
     try {
+      const filtri: IFiltroRicerca = {};
+      if (request.query.centrale)
+        filtri.centrale = request.query.centrale;
       // Recupera la lista degli armadi secondo i parametri inviati dal client
-      const armadi: IArmadi[] = await armadiSchema.find()
+      const armadi: IArmadi[] = await armadiSchema.find(filtri)
         .skip(request.query.page * request.query.limit)
         .limit(request.query.limit)
         .exec();
-      const countDocuments: number = await armadiSchema.countDocuments().exec(); // Restituisce il numero degli armadi presenti nel DB
+      const countDocuments: number = await armadiSchema.countDocuments(filtri).exec(); // Restituisce il numero degli armadi presenti nel DB
       return new ResponseApi({ // Risposta inviata al client
         documentiTotali: countDocuments, // Numero degli armadi presenti nel DB
         pagina: request.query.page, // numero della pagina
