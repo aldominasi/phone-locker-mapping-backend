@@ -12,8 +12,10 @@ const corsAllowed: FastifyPluginAsync = async function (server: FastifyInstance)
           return cb(null, corsOptions);
         }
         const hostname = new URL(origin).hostname;
-        if (hostname === "localhost")
-          corsOptions = { origin: true, credentials: true };
+        if (process.env.DEVELOPMENT != null)
+          corsOptions = { origin: true };
+        else if (hostname === "localhost")
+          corsOptions = { origin: true };
         cb(null, corsOptions);
       };
     });
