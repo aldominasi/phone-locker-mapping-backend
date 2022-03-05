@@ -69,7 +69,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       }
     },
     preHandler: server.verifyAuth // Verifica la sessione dell'utenza
-  }, async (request, reply) => {
+  }, async (request, reply): Promise<ResponseApi> => {
     try {
       // Recupera la lista degli armadi secondo i parametri inviati dal client
       const armadi: IArmadi[] = await armadiSchema.find()

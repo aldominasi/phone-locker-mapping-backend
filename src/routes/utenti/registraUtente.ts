@@ -4,7 +4,7 @@ import IUtenti from '../../entities/utenti/utenti.interface';
 import { ResponseApi } from "../../models/ResponseApi";
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
 import { hash } from 'bcryptjs';
-import {IQuerystringJwt} from "../../plugins/jwtHandler";
+import { IQuerystringJwt } from "../../plugins/jwtHandler";
 
 export default async (server: FastifyInstance, options: FastifyPluginOptions) => {
   /*

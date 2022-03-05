@@ -2,8 +2,10 @@ import { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } f
 import utentiSchema from '../../entities/utenti/utenti.schema';
 import IUtenti from '../../entities/utenti/utenti.interface';
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
-import { ResponseApi } from "../../models/ResponseApi";
-import { IQuerystringJwt } from "../../plugins/jwtHandler";
+import { ResponseApi } from '../../models/ResponseApi';
+import { IQuerystringJwt } from '../../plugins/jwtHandler';
+import { queryInfoPers } from '../../schemas/validations/infoPersonali.validation';
+import { responseInfoPersonali } from '../../schemas/serializations/infoPersonali.serialization';
 
 export default async (server: FastifyInstance, options: FastifyPluginOptions) => {
   /*
@@ -20,6 +22,12 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
   }>('/me', {
     constraints: {
       version: '1.0.0' // Header Accept-Version
+    },
+    schema: {
+      querystring: queryInfoPers,
+      response: {
+        '200': responseInfoPersonali
+      }
     },
     onRequest: server.verifyAuth // Verifica la sessione dell'utenza
   }, async (request, reply: FastifyReply): Promise<ResponseApi> => {
