@@ -3,7 +3,11 @@ import armadiSchema from '../../entities/armadi/armadi.schema';
 import IArmadi from '../../entities/armadi/armadi.interface';
 import { ResponseApi } from '../../models/ResponseApi';
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
-import { paramsArmadi, queryArmadi } from '../../schemas/validations/getArmadi.validation';
+import {
+  paramsArmadi,
+  queryArmadi,
+  queryArmadio
+} from '../../schemas/validations/getArmadi.validation';
 import { responseArmadio, responsePagination } from '../../schemas/serializations/getArmadi.serialization';
 import { IQuerystringJwt } from '../../plugins/jwtHandler';
 
@@ -15,10 +19,12 @@ interface IQuery extends IQuerystringJwt { // Interfaccia delle querystring dell
   page: number; // numero di pagina
   limit: number; // numero di item per pagina
   centrale?: string; // filtro per la ricerca (nome della centrale)
+  zona?: string;
 }
 
 interface IFiltroRicerca {
   centrale?: string;
+  'zona.info1'?: string;
 }
 
 export default async (server: FastifyInstance, options: FastifyPluginOptions) => {
@@ -39,6 +45,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     },
     schema: {
       params: paramsArmadi, // Validazione dei parametri della request
+      querystring: queryArmadio,
       response: {
         '200': responseArmadio // Serializzazione della risposta
       }
@@ -79,6 +86,8 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       const filtri: IFiltroRicerca = {};
       if (request.query.centrale)
         filtri.centrale = request.query.centrale;
+      if (request.query.zona)
+        filtri['zona.info1'] = request.query.zona;
       // Recupera la lista degli armadi secondo i parametri inviati dal client
       const armadi: IArmadi[] = await armadiSchema.find(filtri)
         .skip(request.query.page * request.query.limit)

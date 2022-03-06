@@ -4,6 +4,7 @@ import { ResponseApi } from '../../models/ResponseApi';
 import armadiSchema from '../../entities/armadi/armadi.schema';
 import S from 'fluent-json-schema';
 import ResponseApiSerialization from '../../schemas/serializations/responseApi.serialization';
+import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
 
 export default async (server: FastifyInstance, options: FastifyPluginOptions): Promise<void> => {
   server.get<{
@@ -21,9 +22,14 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions): P
     },
     onRequest: server.verifyAuth
   }, async (request, reply): Promise<ResponseApi> => {
-    const centrali: string[] = (await armadiSchema.aggregate([
-      { $group: { _id: '$centrale' } }
-    ]).exec()).map(centrale => centrale._id);
-    return new ResponseApi(centrali);
+    try {
+      const centrali: string[] = (await armadiSchema.aggregate([
+        { $group: { _id: '$centrale' } }
+      ]).exec()).map(centrale => centrale._id);
+      return new ResponseApi(centrali);
+    } catch (ex) {
+      server.log.error(ex);
+      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 4);
+    }
   });
 };
