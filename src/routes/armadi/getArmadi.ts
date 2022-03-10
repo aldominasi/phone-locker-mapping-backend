@@ -53,6 +53,12 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     preHandler: server.verifyAuth // Verifica la sessione dell'utenza
   }, async (request, reply): Promise<ResponseApi> => {
     try {
+      const tokenData = await server.getDataFromToken(request.query.token);
+      if (tokenData == null)
+        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 2);
+      const permesso: boolean = await server.verificaPermessi(tokenData.id, 'readArmadi');
+      if (!permesso)
+        return new ResponseApi(null, false, 'Accesso non autorizzato', 2);
       const armadio: IArmadi | null = await armadiSchema.findById(request.params.id).exec(); // Recupero l'armadio
       if (armadio == null) { // Armadio non trovato
         return new ResponseApi(null, false, 'Armadio non trovato', 3);
@@ -83,6 +89,12 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     preHandler: server.verifyAuth // Verifica la sessione dell'utenza
   }, async (request, reply): Promise<ResponseApi> => {
     try {
+      const tokenData = await server.getDataFromToken(request.query.token);
+      if (tokenData == null)
+        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 2);
+      const permesso: boolean = await server.verificaPermessi(tokenData.id, 'readArmadi');
+      if (!permesso)
+        return new ResponseApi(null, false, 'Accesso non autorizzato', 2);
       const filtri: IFiltroRicerca = {};
       if (request.query.centrale)
         filtri.centrale = request.query.centrale;
