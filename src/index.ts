@@ -41,7 +41,7 @@ const start = async (): Promise<void> => {
         "numeroCellulare": "333098273645",
         "nome": "admin",
         "cognome": "admin",
-        "ruolo": "6209650e119aec91b09f847d"
+        "ruolo": "ADMIN"
       });
     await server.listen(PORT, '0.0.0.0');
   } catch (ex) {
