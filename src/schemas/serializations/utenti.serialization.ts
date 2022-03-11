@@ -15,12 +15,5 @@ export const paginationUtenti = ResponseApiSerialization
           .prop('nome', S.string())
           .prop('cognome', S.string())
           .prop('ruolo', S.string())
-          .prop('permessi',
-            S.object()
-              .prop('readUtenti', S.boolean())
-              .prop('writeUtenti', S.boolean())
-              .prop('readArmadi', S.boolean())
-              .prop('writeArmadi', S.boolean())
-          )
       )
     )).raw({ nullable: true });

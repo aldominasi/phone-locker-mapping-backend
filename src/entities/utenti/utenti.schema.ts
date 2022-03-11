@@ -30,24 +30,6 @@ const utentiSchema = new Schema<IUtenti>({
     type: String,
     required: true
   },
-  permessi: {
-    readUtenti: {
-      type: Boolean,
-      default: false
-    },
-    writeUtenti: {
-      type: Boolean,
-      default: false
-    },
-    readArmadi: {
-      type: Boolean,
-      default: true
-    },
-    writeArmadi: {
-      type: Boolean,
-      default: false
-    }
-  }
 }, {
   timestamps: true
 });

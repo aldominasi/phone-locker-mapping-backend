@@ -6,6 +6,8 @@ import { ResponseApi } from '../../models/ResponseApi';
 import { IQuerystringJwt } from '../../plugins/jwtHandler';
 import { queryInfoPers } from '../../schemas/validations/infoPersonali.validation';
 import { responseInfoPersonali } from '../../schemas/serializations/infoPersonali.serialization';
+import { IRuoli, IPermessi } from '../../entities/ruoli/ruoli.interface';
+import ruoliSchema from '../../entities/ruoli/ruoli.schema';
 
 export default async (server: FastifyInstance, options: FastifyPluginOptions) => {
   /*
@@ -35,10 +37,16 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       const tokenData = server.getDataFromToken(request.query.token); // Recupera le informazioni contenute nel token jwt
       if (tokenData == null) // Informazioni non recuperate
         return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 3);
-      const utente: null | IUtenti = await utentiSchema.findById(tokenData.id, {_id: 0, password: 0}).exec(); // Recupera l'utente
+      const utente = await utentiSchema.findById(tokenData.id, {_id: 0, password: 0}).exec(); // Recupera l'utente
       if (utente == null) // Utente non trovato
         return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 4);
-      return new ResponseApi(utente); // Risposta inviata al client
+      const ruolo: IRuoli | null = await ruoliSchema.findById(utente.ruolo).exec();
+      if (ruolo == null)
+        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 5);
+      return new ResponseApi({
+        ...utente.toObject(),
+        permessi: ruolo.permessi
+      }); // Risposta inviata al client
     } catch (ex) {
       server.log.error(ex);
       return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 5);

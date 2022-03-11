@@ -9,11 +9,4 @@ export const bodyVal = S.object()
   .prop('numeroCellulare', S.string().required())
   .prop('nome', S.string().required())
   .prop('cognome', S.string().required())
-  .prop('ruolo', S.string().required())
-  .prop('permessi',
-    S.object()
-      .prop('readUtenti', S.boolean()).required()
-      .prop('writeUtenti', S.boolean().required())
-      .prop('readArmadi', S.boolean().required())
-      .prop('writeArmadi', S.boolean().required())
-  );
+  .prop('ruolo', S.string().required());

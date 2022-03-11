@@ -6,14 +6,7 @@ const utente = S.object()
   .prop('numeroCellulare', S.string())
   .prop('nome', S.string())
   .prop('cognome', S.string())
-  .prop('ruolo', S.string())
-  .prop('permessi',
-    S.object()
-      .prop('readUtenti', S.boolean())
-      .prop('writeUtenti', S.boolean())
-      .prop('readArmadi', S.boolean())
-      .prop('writeArmadi', S.boolean())
-  );
+  .prop('ruolo', S.string());
 
 export default ResponseApiSerialization
   .prop('data', utente).raw({ nullable: true });
