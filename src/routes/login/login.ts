@@ -35,14 +35,14 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
   }, async (request, reply): Promise<ResponseApi> => {
     try {
       const { email, password } = request.body; //Recupero l'email e la password inviate dal client
-      const utente: IUtenti | null = await utentiSchema.findOne({ email: email }).exec(); // Cerco l'utente utilizzando i dati ricevuti dal client
+      const utente = await utentiSchema.findOne({ email: email }).exec(); // Cerco l'utente utilizzando i dati ricevuti dal client
       if (utente == null) // Utente non trovato
         return new ResponseApi(null, false, 'Username o password non corretti', 2);
       const pwdIsCorrect: boolean = await compare(password, utente.password); // controllo se la password è corretta
       if (!pwdIsCorrect) // Password non corretta
         return new ResponseApi(null, false, 'Username o password non corretti', 3);
       const signIn = server.signAuth(request, { // Firma del JWT contenente l'id dell'utente
-        id: utente._id
+        id: utente._id.toString()
       });
       return new ResponseApi({ // Response del server
         auth: signIn != null,

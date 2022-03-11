@@ -1,10 +1,11 @@
-import { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
+import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import utentiSchema from '../../entities/utenti/utenti.schema';
 import IUtenti from '../../entities/utenti/utenti.interface';
 import { ResponseApi } from "../../models/ResponseApi";
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
 import { hash } from 'bcryptjs';
-import { IQuerystringJwt } from "../../plugins/jwtHandler";
+import { IQuerystringJwt } from '../../plugins/jwtHandler';
+import { EnumRuoli, Ruoli } from '../../models/Ruoli';
 
 export default async (server: FastifyInstance, options: FastifyPluginOptions) => {
   /*
@@ -30,8 +31,14 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       const permesso = await server.verificaPermessi(tokenData.id, 'writeUtenti');
       if (!permesso)
         return new ResponseApi(null, false, "Accesso non autorizzato", 3);
+      if (!(request.body.ruolo in EnumRuoli))
+        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 4);
       request.body.password = await hash(request.body.password, parseInt(process.env.SALT_PWD ?? '8')); // Esegue l'encrypt della password
-      const utenteCreato = await utentiSchema.create(request.body); // Crea l'utente
+      const utente: IUtenti = {
+        ...request.body,
+        ruolo: EnumRuoli[request.body.ruolo as Ruoli]
+      };
+      const utenteCreato = await utentiSchema.create(utente); // Crea l'utente
       return new ResponseApi(utenteCreato); // Risposta inviata al client
     } catch (ex) {
       server.log.error(ex);

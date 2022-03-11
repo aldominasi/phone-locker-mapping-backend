@@ -1,5 +1,3 @@
-import { Document } from 'mongoose';
-
 export interface IPermessi {
   readUtenti: boolean;
   writeUtenti: boolean;
@@ -7,7 +5,7 @@ export interface IPermessi {
   writeArmadi: boolean;
 }
 
-export default interface IUtenti extends Document {
+export default interface IUtenti {
   email: string;
   password: string;
   modPwdData: Date;

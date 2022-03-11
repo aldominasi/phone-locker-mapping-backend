@@ -1,6 +1,4 @@
-import { Document } from 'mongoose';
-
-export default interface IArmadi extends Document {
+export default interface IArmadi {
   centrale: string;
   progressivo: number;
   zona: {

@@ -1,7 +1,7 @@
 import { model, Schema } from 'mongoose';
 import IUtenti from './utenti.interface';
 
-const utentiSchema: Schema = new Schema<IUtenti>({
+const utentiSchema = new Schema<IUtenti>({
   email: {
     type: String,
     required: true
@@ -23,6 +23,10 @@ const utentiSchema: Schema = new Schema<IUtenti>({
     required: true
   },
   cognome: {
+    type: String,
+    required: true
+  },
+  ruolo: {
     type: String,
     required: true
   },
