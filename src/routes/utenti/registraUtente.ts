@@ -1,11 +1,13 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import utentiSchema from '../../entities/utenti/utenti.schema';
 import IUtenti from '../../entities/utenti/utenti.interface';
-import { ResponseApi } from "../../models/ResponseApi";
+import { ResponseApi } from '../../models/ResponseApi';
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
 import { hash } from 'bcryptjs';
 import { IQuerystringJwt } from '../../plugins/jwtHandler';
 import { EnumRuoli, Ruoli } from '../../models/Ruoli';
+import { bodyVal, queryVal } from '../../schemas/validations/registraUtente.validation';
+import serializeReply from '../../schemas/serializations/registraUtente.serialization';
 
 export default async (server: FastifyInstance, options: FastifyPluginOptions) => {
   /*
@@ -21,6 +23,13 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
   }>('/', {
     constraints: {
       version: '1.0.0' // Header Accept-Version
+    },
+    schema: {
+      querystring: queryVal,
+      body: bodyVal,
+      response: {
+        '201': serializeReply
+      }
     },
     onRequest: server.verifyAuth // Verifica il token jwt restituito all'attod della login
   }, async (request, reply): Promise<ResponseApi> => {
