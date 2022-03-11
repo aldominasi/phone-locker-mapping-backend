@@ -1,6 +1,5 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import utentiSchema from '../../entities/utenti/utenti.schema';
-import IUtenti from '../../entities/utenti/utenti.interface';
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
 import { ResponseApi } from '../../models/ResponseApi';
 import { compare } from 'bcryptjs';
