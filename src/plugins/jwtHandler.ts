@@ -36,7 +36,7 @@ async function verifyAuth (request: FastifyRequest<{ Querystring: IQuerystringJw
     });
   } catch (ex) {
     console.error(ex);
-    return reply.status(200).send(new ResponseApi(null, false, 'Il servio non è al momento disponibile', 2));
+    return reply.status(200).send(new ResponseApi(null, false, 'Il servizio non è al momento disponibile', 2));
   }
 }
 
