@@ -1,13 +1,22 @@
-import { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
+import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import IUtenti from '../../entities/utenti/utenti.interface';
 import utentiSchema from '../../entities/utenti/utenti.schema';
 import { IQuerystringJwt } from '../../plugins/jwtHandler';
 import { ResponseApi } from '../../models/ResponseApi';
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
+import queryValidation from '../../schemas/validations/utenti.validation';
+import replySerialize from '../../schemas/serializations/utenti.serialization';
 
 interface IQuery extends IQuerystringJwt { // Interfaccia per la querystring della request
   page: number;
   limit: number;
+  email?: string;
+  ruolo?: string;
+}
+
+interface IQueryUtenti {
+  email?: string;
+  ruolo?: string;
 }
 
 export default async (server: FastifyInstance, options: FastifyPluginOptions) => {
@@ -21,6 +30,12 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     constraints: {
       version: '1.0.0' // Header Accept-Version
     },
+    schema: {
+      querystring: queryValidation,
+      response: {
+        '200': replySerialize
+      }
+    },
     onRequest: server.verifyAuth // Verifica il token jwt restituito all'attod della login
   }, async (request, reply) => {
     try {
@@ -30,7 +45,12 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       const permesso = await server.verificaPermessi(tokenData.id, 'readUtenti');
       if (!permesso)
         return new ResponseApi(null, false, 'Accesso non autorizzato', 3);
-      const utenti: IUtenti[] = await utentiSchema.find({}, {
+      const query: IQueryUtenti = {};
+      if (request.query.email != null)
+        query.email = request.query.email;
+      if (request.query.ruolo != null)
+        query.ruolo = request.query.ruolo;
+      const utenti: IUtenti[] = await utentiSchema.find(query, {
         _id: 0, password: 0, modPwdData: 0
       })
         .skip(request.query.page * request.query.limit)

@@ -1,7 +1,7 @@
 import S from 'fluent-json-schema';
 import ResponseApiSerialization from './responseApi.serialization';
 
-export const paginationUtenti = ResponseApiSerialization
+export default ResponseApiSerialization
   .prop('data', S.object()
     .prop('documentiTotali', S.number())
     .prop('pagina', S.number())
