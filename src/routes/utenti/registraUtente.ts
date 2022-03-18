@@ -5,7 +5,6 @@ import { ResponseApi } from '../../models/ResponseApi';
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
 import { hash } from 'bcryptjs';
 import { IQuerystringJwt } from '../../plugins/jwtHandler';
-import { EnumRuoli, Ruoli } from '../../models/Ruoli';
 import { IRuoli } from '../../entities/ruoli/ruoli.interface';
 import ruoliSchema from '../../entities/ruoli/ruoli.schema';
 import { bodyVal, queryVal } from '../../schemas/validations/registraUtente.validation';

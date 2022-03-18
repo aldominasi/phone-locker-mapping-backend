@@ -1,9 +1,11 @@
 import { model, Schema } from 'mongoose';
 import IUtenti from './utenti.interface';
+import { regexEmail } from '../../utilities/defaultValue';
 
 const utentiSchema = new Schema<IUtenti>({
   email: {
     type: String,
+    validate: regexEmail,
     required: true
   },
   modPwdData: {
