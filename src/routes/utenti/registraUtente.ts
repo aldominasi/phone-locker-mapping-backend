@@ -46,12 +46,18 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       }).exec();
       if (ruoloDaAssegnare == null)
         return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 5);
-      request.body.password = await hash(request.body.password, parseInt(process.env.SALT_PWD ?? '8')); // Esegue l'encrypt della password
+      const pwd: string = server.createPwd(6, true, false);
+      request.body.password = await hash(pwd, parseInt(process.env.SALT_PWD ?? '8')); // Esegue l'encrypt della password
       const utente: IUtenti = {
         ...request.body,
         ruolo: ruoloDaAssegnare._id
       };
       const utenteCreato = await utentiSchema.create(utente); // Crea l'utente
+      await server.mailer.sendMail({
+        to: utenteCreato.email,
+        subject: 'Nuovo account Plm',
+        text: `E' stato creato un nuovo account. La tua password per accedere ai servizi Plm è ${pwd}\nTi invitiamo a cambiarla`
+      });
       return new ResponseApi(utenteCreato); // Risposta inviata al client
     } catch (ex) {
       server.log.error(ex);
