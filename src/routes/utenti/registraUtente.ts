@@ -41,16 +41,14 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       const permesso = await server.verificaPermessi(tokenData.id, 'writeUtenti');
       if (!permesso)
         return new ResponseApi(null, false, "Accesso non autorizzato", 3);
-      const ruoloDaAssegnare: IRuoli | null = await ruoliSchema.findOne({
-        id: request.body.ruolo
-      }).exec();
+      const ruoloDaAssegnare: IRuoli | null = await ruoliSchema.findById(request.body.ruolo).exec();
       if (ruoloDaAssegnare == null)
         return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 5);
       const pwd: string = server.createPwd(6, true, false);
       request.body.password = await hash(pwd, parseInt(process.env.SALT_PWD ?? '8')); // Esegue l'encrypt della password
       const utente: IUtenti = {
         ...request.body,
-        ruolo: ruoloDaAssegnare._id
+        ruolo: request.body.ruolo
       };
       const utenteCreato = await utentiSchema.create(utente); // Crea l'utente
       await server.mailer.sendMail({
