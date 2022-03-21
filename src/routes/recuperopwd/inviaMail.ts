@@ -36,7 +36,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       await server.mailer.sendMail({
         to: request.body.email,
         subject: 'Recupero Password Plm',
-        html: `<p>Vai al seguente link per modificare la password <a href="${process.env.HOST_PLM}?tkn=${tokenUtente}">${process.env.HOST_PLM}</a></p>`
+        html: `<p>Vai al seguente link per modificare la password <a href="${process.env.HOST_PLM}:8080/plm/#/pwdLost?tkn=${tokenUtente}">${process.env.HOST_PLM}</a></p>`
       });
       return new ResponseApi('A breve riceverai una mail contenente le informazioni per recuperare la password.');
     } catch (ex) {
