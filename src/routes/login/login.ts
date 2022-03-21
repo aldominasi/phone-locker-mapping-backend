@@ -40,7 +40,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       const pwdIsCorrect: boolean = await compare(password, utente.password); // controllo se la password è corretta
       if (!pwdIsCorrect) // Password non corretta
         return new ResponseApi(null, false, 'Username o password non corretti', 3);
-      const signIn = server.signAuth(request, { // Firma del JWT contenente l'id dell'utente
+      const signIn = server.signAuth({ // Firma del JWT contenente l'id dell'utente
         id: utente._id.toString()
       });
       return new ResponseApi({ // Response del server

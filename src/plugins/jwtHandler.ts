@@ -42,13 +42,14 @@ async function verifyAuth (request: FastifyRequest<{ Querystring: IQuerystringJw
 
 /**
  * Esegue la firma del token jwt. La funzione restituisce il token o null in caso di errore.
- * @param request FastifyInstance
  * @param data Informazioni da includere nel token jwt
+ * @param expire
  */
 
-function signAuth(request: FastifyRequest, data: JwtPayload): string | null {
+function signAuth(data: JwtPayload, expire: number | undefined = undefined): string | null {
   try {
-    return sign(data, process.env.SEED_JWT_TOKEN as string); //Genera il token
+    return expire == undefined ? sign(data, process.env.SEED_JWT_TOKEN as string) :
+      sign(data, process.env.SEED_JWT_TOKEN as string, { expiresIn: expire });
   } catch (ex) {
     console.error(ex);
     return null;
@@ -70,7 +71,7 @@ function getDataFromToken(jwt: string): null | CustomJwtPayload {
 
 declare module "fastify" {
   export interface FastifyInstance {
-    signAuth: (request: FastifyRequest, data: CustomJwtPayload) => string | null;
+    signAuth: (data: CustomJwtPayload, expire?: number) => string | null;
     verifyAuth: (request: FastifyRequest<{ Querystring: IQuerystringJwt }>, reply: FastifyReply) => Promise<void>;
     getDataFromToken: (jwt: string) => null | CustomJwtPayload;
   }
