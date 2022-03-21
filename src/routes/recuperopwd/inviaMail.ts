@@ -32,9 +32,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       const utente = await utentiSchema.findOne({ email: request.body.email });
       if (utente == null)
         return new ResponseApi(null, false, 'Qualcosa è andato storto. Riprova più tardi', 1);
-      const tokenUtente = await server.signAuth({ // Firma del Jwt contenente l'id dell'utente
-        id: utente._id.toString()
-      });
+      const tokenUtente = await server.signAuth({ id: utente._id.toString() }, 1200); // Firma il token per 20 minuti
       await server.mailer.sendMail({
         to: request.body.email,
         subject: 'Recupero Password Plm',
