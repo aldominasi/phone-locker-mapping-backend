@@ -1,39 +1,39 @@
-import { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
-import { ResponseApi } from '../../models/ResponseApi';
-import utentiSchema from '../../entities/utenti/utenti.schema';
-import IUtenti from '../../entities/utenti/utenti.interface';
-import S from 'fluent-json-schema';
-import ResponseApiSerialization from '../../schemas/serializations/responseApi.serialization';
+import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
+import { ResponseApi } from '../../models/ResponseApi';
 import { IQuerystringJwt } from '../../plugins/jwtHandler';
-import { hash } from 'bcryptjs';
-const regexPassword = /^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9]).{6,})\S$/;
+import { bodyVal, queryVal } from '../../schemas/validations/modificaPwd.validation';
+import modificaPwdSerialization from '../../schemas/serializations/modificaPwd.serialization';
+import IUtenti from '../../entities/utenti/utenti.interface';
+import utentiSchema from '../../entities/utenti/utenti.schema';
+import { hash, compare } from 'bcryptjs';
 
-interface IBodyModPwd {
-  pwd: string;
+interface IBody {
+  oldPwd: string;
+  newPwd: string;
 }
 
 export default async (server: FastifyInstance, options: FastifyPluginOptions) => {
   /*
-  REST API per modificare la password dopo aver ricevuto la mail
+  REST API per modificare la password conoscendo quella corrente
   Codici di errore:
 
    */
   server.post<{
     Querystring: IQuerystringJwt,
-    Body: IBodyModPwd
-  }>('/modifica', {
+    Body: IBody
+  }>('/', {
     constraints: {
-      version: '1.0.0' // Header Accept-Version
+      version: '1.0.0'
     },
     schema: {
-      querystring: S.object().prop('token', S.string().required()),
-      body: S.object().prop('pwd', S.string().pattern(regexPassword).required()),
+      querystring: queryVal,
+      body: bodyVal,
       response: {
-        '200': ResponseApiSerialization.prop('data', S.string()).raw({ nullable: true })
+        '200': modificaPwdSerialization
       }
     },
-    preHandler: server.verifyAuth // Verifica l'identità
+    preHandler: server.verifyAuth
   }, async (request, reply): Promise<ResponseApi> => {
     try {
       const tokenData = await server.getDataFromToken(request.query.token);
@@ -42,7 +42,9 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       const utente: IUtenti | null = await utentiSchema.findById(tokenData.id).exec(); // Recupera l'utenza
       if (utente == null)
         return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 4);
-      const nuovaPassword: string = await hash(request.body.pwd, parseInt(process.env.SALT_PWD as string));
+      if (!(await compare(request.body.oldPwd, utente.password)))
+        return new ResponseApi(null, false, 'Accesso non verificato', 5);
+      const nuovaPassword: string = await hash(request.body.newPwd, parseInt(process.env.SALT_PWD as string));
       await utentiSchema.findByIdAndUpdate(tokenData.id, {
         $set: { password: nuovaPassword }
       }).exec();
