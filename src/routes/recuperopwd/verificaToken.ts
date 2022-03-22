@@ -5,6 +5,11 @@ import ResponseApiSerialization from '../../schemas/serializations/responseApi.s
 import { IQuerystringJwt } from '../../plugins/jwtHandler';
 
 export default async (server: FastifyInstance, options: FastifyPluginOptions) => {
+  /*
+  REST API per verificare il token di accesso
+  Codici di errore:
+  2 - Token non valido o scaduto
+   */
   server.get<{
     Querystring: IQuerystringJwt
   }>('/verificatoken', {
