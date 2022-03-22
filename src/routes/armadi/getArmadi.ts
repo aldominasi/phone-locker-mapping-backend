@@ -31,10 +31,11 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
   /*
   REST API per recuperare le informazioni dell'armadio
   Codici di errore:
-  1 - Il client non ha eseguito la login oppure la sessione è scaduta
-  2 - Errore nella verifica della sessione
-  3 - Armadio non trovato
-  4 - Errore generico
+  1 - Errore generico
+  2 - Token non valido o scaduto
+  3 - Errore nel recupero delle informazioni presenti nel token
+  4 - L'utente non ha il permesso di accedere all'API
+  5 - Armadio non trovato
    */
   server.get<{
     Querystring: IQuerystringJwt,
@@ -55,24 +56,27 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     try {
       const tokenData = await server.getDataFromToken(request.query.token);
       if (tokenData == null)
-        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 2);
+        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 3);
       const permesso: boolean = await server.verificaPermessi(tokenData.id, 'readArmadi');
       if (!permesso)
-        return new ResponseApi(null, false, 'Accesso non autorizzato', 2);
+        return new ResponseApi(null, false, 'Accesso non autorizzato', 4);
       const armadio: IArmadi | null = await armadiSchema.findById(request.params.id).exec(); // Recupero l'armadio
       if (armadio == null) { // Armadio non trovato
-        return new ResponseApi(null, false, 'Armadio non trovato', 3);
+        return new ResponseApi(null, false, 'Armadio non trovato', 5);
       }
       return new ResponseApi(armadio); // Invia al client l'armadio
     } catch (ex) {
       server.log.error(ex);
-      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 4);
+      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 1);
     }
   });
   /*
   REST API per recuperare la lista degli armadi utilizzando il metodo della paginazione
   Codici di errore:
   1 - Errore generico
+  2 - Token non valido o scaduto
+  3 - Errore nel recupero delle informazioni presenti nel token
+  4 - L'utente non ha il permesso di accedere all'API
    */
   server.get<{
     Querystring: IQuery
@@ -91,10 +95,10 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     try {
       const tokenData = await server.getDataFromToken(request.query.token);
       if (tokenData == null)
-        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 2);
+        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 3);
       const permesso: boolean = await server.verificaPermessi(tokenData.id, 'readArmadi');
       if (!permesso)
-        return new ResponseApi(null, false, 'Accesso non autorizzato', 2);
+        return new ResponseApi(null, false, 'Accesso non autorizzato', 4);
       const filtri: IFiltroRicerca = {};
       if (request.query.centrale)
         filtri.centrale = request.query.centrale;
@@ -114,7 +118,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       });
     } catch (ex) {
       server.log.error(ex);
-      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 2);
+      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 1);
     }
   });
 };

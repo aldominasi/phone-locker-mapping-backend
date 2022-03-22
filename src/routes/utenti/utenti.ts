@@ -8,10 +8,10 @@ import queryValidation from '../../schemas/validations/utenti.validation';
 import replySerialize from '../../schemas/serializations/utenti.serialization';
 
 interface IQuery extends IQuerystringJwt { // Interfaccia per la querystring della request
-  page: number;
-  limit: number;
-  email?: string;
-  ruolo?: string;
+  page: number; // Numero di pagina
+  limit: number; // Numero degli elementi per pagina
+  email?: string; // filtro per query
+  ruolo?: string; // filtro per la query
 }
 
 interface IQueryUtenti {
@@ -23,6 +23,10 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
   /*
   REST API per recuperare la lista degli utenti
   Codici di errore:
+  1 - Errore generico
+  2 - Token non valido o scaduto
+  3 - Errore nel recupero delle informazioni presenti nel token
+  4 - L'utente non ha il permesso di accedere all'API
    */
   server.get<{
     Querystring: IQuery
@@ -39,12 +43,13 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     onRequest: server.verifyAuth // Verifica il token jwt restituito all'attod della login
   }, async (request, reply) => {
     try {
-      const tokenData = await server.getDataFromToken(request.query.token);
+      const tokenData = await server.getDataFromToken(request.query.token); // Recupero le info dal token
       if (tokenData == null)
-        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 2);
-      const permesso = await server.verificaPermessi(tokenData.id, 'readUtenti');
+        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 3);
+      const permesso = await server.verificaPermessi(tokenData.id, 'readUtenti'); // Controllo i permessi dell'utente
       if (!permesso)
-        return new ResponseApi(null, false, 'Accesso non autorizzato', 3);
+        return new ResponseApi(null, false, 'Accesso non autorizzato', 4);
+      // Creo la query con i dati presenti nella richiesta
       const query: IQueryUtenti = {};
       if (request.query.email != null)
         query.email = request.query.email;
@@ -66,7 +71,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       });
     } catch (ex) {
       server.log.error(ex);
-      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 3);
+      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 1);
     }
   });
 };

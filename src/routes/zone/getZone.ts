@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
+import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import armadiSchema from '../../entities/armadi/armadi.schema';
 import { IQuerystringJwt } from '../../plugins/jwtHandler';
 import { ResponseApi } from '../../models/ResponseApi';
@@ -12,6 +12,14 @@ interface IQuery extends IQuerystringJwt {
 }
 
 export default async (server: FastifyInstance, options: FastifyPluginOptions) => {
+  /*
+  REST API per recuperare la lista delle zone
+  Codici di errore:
+  1 - Errore generico
+  2 - Token non valido o scaduto
+  3 - Errore nel recupero delle informazioni presenti nel token
+  4 - L'utente non ha il permesso di accedere all'API
+   */
   server.get<{
     Querystring: IQuery
   }>('/', {
@@ -28,14 +36,15 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     }
   }, async (request, reply): Promise<ResponseApi> => {
     try {
-      const filtri: PipelineStage[] = [{ $group: { _id: '$zona.info1' } }];
-      if (request.query.centrale)
+      const filtri: PipelineStage[] = [{ $group: { _id: '$zona.info1' } }]; // Pipeline per il raggruppamento
+      if (request.query.centrale) // Se il filtro centrale è presente nella richiesta aggiungo la pipeline match
         filtri.unshift({ $match: { centrale: request.query.centrale } });
+      // Recupero le zone ed eseguo un remapping dei dati per restituire la lista nel formato atteso dal client
       const zone: string[] = (await armadiSchema.aggregate(filtri).exec()).map(item => item._id);
       return new ResponseApi(zone);
     } catch (ex) {
       server.log.error(ex);
-      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 4);
+      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 1);
     }
   });
 };

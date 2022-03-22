@@ -14,10 +14,11 @@ interface IBody {
 
 export default async (server: FastifyInstance, options: FastifyPluginOptions) => {
   /*
-  REST API per effettuare la login
+  REST API per effettuare l'accesso alle funzionalità messe a disposizione dalla piattaforma'
+  Codici di errore:
   1 - Errore generico
-  2 - Utente non trovato
-  3 - Password errata
+  2 - Utente non trovato (l'email non è presente nel db)
+  3 - La password inserita dall'utente non è corretta
    */
   server.post<{
     Body: IBody

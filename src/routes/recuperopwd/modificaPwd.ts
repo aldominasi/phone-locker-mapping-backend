@@ -17,7 +17,10 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
   /*
   REST API per modificare la password dopo aver ricevuto la mail
   Codici di errore:
-
+  1 - Errore generico
+  2 - Token non valido o scaduto
+  3 - Errore nel recupero delle informazioni presenti nel token
+  4 - Utente non trovato
    */
   server.post<{
     Querystring: IQuerystringJwt,
@@ -36,20 +39,20 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     preHandler: server.verifyAuth // Verifica l'identità
   }, async (request, reply): Promise<ResponseApi> => {
     try {
-      const tokenData = await server.getDataFromToken(request.query.token);
+      const tokenData = await server.getDataFromToken(request.query.token); // Recupero le informazioni dal token
       if (tokenData == null)
-        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 2);
+        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 3);
       const utente: IUtenti | null = await utentiSchema.findById(tokenData.id).exec(); // Recupera l'utenza
       if (utente == null)
         return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 4);
-      const nuovaPassword: string = await hash(request.body.pwd, parseInt(process.env.SALT_PWD as string));
+      const nuovaPassword: string = await hash(request.body.pwd, parseInt(process.env.SALT_PWD as string)); // Eseguo l'hash della nuova password
       await utentiSchema.findByIdAndUpdate(tokenData.id, {
         $set: { password: nuovaPassword }
-      }).exec();
+      }).exec(); // Eseguo l'update della password
       return new ResponseApi('La password è stata modificata correttamente');
     } catch (ex) {
       server.log.error(ex);
-      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 3);
+      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 1);
     }
   });
 };

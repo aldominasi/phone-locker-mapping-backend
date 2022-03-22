@@ -17,7 +17,11 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
   /*
   REST API per modificare la password conoscendo quella corrente
   Codici di errore:
-
+  1 - Errore generico
+  2 - Token non valido o scaduto
+  3 - Errore nel recupero delle informazioni presenti nel token
+  4 - Utente non trovato
+  5 - La password corrente non è corretta
    */
   server.post<{
     Querystring: IQuerystringJwt,
@@ -38,7 +42,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     try {
       const tokenData = await server.getDataFromToken(request.query.token);
       if (tokenData == null)
-        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 2);
+        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 3);
       const utente: IUtenti | null = await utentiSchema.findById(tokenData.id).exec(); // Recupera l'utenza
       if (utente == null)
         return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 4);
@@ -51,7 +55,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       return new ResponseApi('La password è stata modificata correttamente');
     } catch (ex) {
       server.log.error(ex);
-      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 3);
+      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 1);
     }
   });
 };

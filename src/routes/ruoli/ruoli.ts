@@ -5,6 +5,11 @@ import { ResponseApi } from '../../models/ResponseApi';
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
 
 export default async (server: FastifyInstance, options: FastifyPluginOptions) => {
+  /*
+  REST API per recuperare la lista dei ruoli
+  Codici di errore:
+  1 - Errore generico
+   */
   server.get('/', {
     constraints: {
       version: '1.0.0'
@@ -16,11 +21,11 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     }
   }, async (request, reply) => {
     try {
-      const ruoli = await ruoliSchema.find().exec();
+      const ruoli = await ruoliSchema.find().exec(); // Recupero la lista dei ruoli
       return new ResponseApi(ruoli);
     } catch (ex) {
       server.log.error(ex);
-      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 2);
+      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 1);
     }
   });
 };

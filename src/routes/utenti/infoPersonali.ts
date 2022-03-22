@@ -1,6 +1,5 @@
 import { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
 import utentiSchema from '../../entities/utenti/utenti.schema';
-import IUtenti from '../../entities/utenti/utenti.interface';
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
 import { ResponseApi } from '../../models/ResponseApi';
 import { IQuerystringJwt } from '../../plugins/jwtHandler';
@@ -13,11 +12,11 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
   /*
   REST API per recuperare le info dell'utente
   Codici di errore:
-  1 - Il client non ha eseguito la login oppure la sessione è scaduta
-  2 - Errore nella verifica della sessione
-  3 - Errore info jwt
+  1 - Errore generico
+  2 - Token non valido o scaduto
+  3 - Errore nel recupero delle informazioni presenti nel token
   4 - Utente non trovato
-  5 - Errore generico
+  5 - Il ruolo associato all'utente non è presente in piattaforma
    */
   server.get<{
     Querystring: IQuerystringJwt
@@ -41,7 +40,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       if (utente == null) // Utente non trovato
         return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 4);
       const ruolo: IRuoli | null = await ruoliSchema.findById(utente.ruolo).exec();
-      if (ruolo == null)
+      if (ruolo == null) // Ricerco il ruolo nella collection ruolis per recuperare le info associate al ruolo dell'utente
         return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 5);
       return new ResponseApi({
         ...utente.toObject(),
@@ -49,7 +48,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       }); // Risposta inviata al client
     } catch (ex) {
       server.log.error(ex);
-      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 5);
+      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 1);
     }
   });
 };

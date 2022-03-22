@@ -13,7 +13,8 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
   /*
   REST API per inviare la mail di recupero password
   Codici di errore:
-
+  1 - Errore generico
+  3 - Utente non trovato
    */
   server.post<{
     Body: IBodySendMail
@@ -29,11 +30,11 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     }
   }, async (request, reply) => {
     try {
-      const utente = await utentiSchema.findOne({ email: request.body.email });
+      const utente = await utentiSchema.findOne({ email: request.body.email }); // Cerca l'utente con l'email presente nel payload della richiesta
       if (utente == null)
-        return new ResponseApi(null, false, 'Qualcosa è andato storto. Riprova più tardi', 1);
+        return new ResponseApi(null, false, 'Si è verificato un errore. Riprova più tardi', 3);
       const tokenUtente = await server.signAuth({ id: utente._id.toString() }, 1200); // Firma il token per 20 minuti
-      await server.mailer.sendMail({
+      await server.mailer.sendMail({ // Invia una mail contenente l'url per modificare la password
         to: request.body.email,
         subject: 'Recupero Password Plm',
         html: `<p>Vai al seguente link per modificare la password <a href="${process.env.HOST_PLM}?tkn=${tokenUtente}">${process.env.HOST_PLM}</a></p>`
@@ -41,7 +42,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       return new ResponseApi('A breve riceverai una mail contenente le informazioni per recuperare la password.');
     } catch (ex) {
       server.log.error(ex);
-      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 3);
+      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 1);
     }
   });
 };

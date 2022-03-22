@@ -7,6 +7,12 @@ import ResponseApiSerialization from '../../schemas/serializations/responseApi.s
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
 
 export default async (server: FastifyInstance, options: FastifyPluginOptions): Promise<void> => {
+  /*
+  REST API per recuperare la lista delle centrali presenti nel db
+  Codici di errore:
+  1 - Errore generico
+  2 - Token non valido o scaduto
+   */
   server.get<{
     Querystring: IQuerystringJwt
   }>('/', {
@@ -29,7 +35,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions): P
       return new ResponseApi(centrali);
     } catch (ex) {
       server.log.error(ex);
-      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 4);
+      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 1);
     }
   });
 };
