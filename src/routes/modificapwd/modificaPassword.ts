@@ -47,7 +47,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       if (utente == null)
         return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 4);
       if (!(await compare(request.body.oldPwd, utente.password)))
-        return new ResponseApi(null, false, 'Accesso non verificato', 5);
+        return new ResponseApi(null, false, 'I dati non sono corretti', 5);
       const nuovaPassword: string = await hash(request.body.newPwd, parseInt(process.env.SALT_PWD as string));
       await utentiSchema.findByIdAndUpdate(tokenData.id, {
         $set: { password: nuovaPassword }

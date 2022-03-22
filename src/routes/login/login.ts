@@ -43,7 +43,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
         return new ResponseApi(null, false, 'Username o password non corretti', 3);
       const signIn = server.signAuth({ // Firma del JWT contenente l'id dell'utente
         id: utente._id.toString()
-      });
+      }, 3600); // expire in 1 hour
       return new ResponseApi({ // Response del server
         auth: signIn != null,
         token: signIn
