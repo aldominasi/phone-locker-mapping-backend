@@ -30,7 +30,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
         '201': serializeReply
       }
     },
-    onRequest: server.verifyAuth
+    onRequest: [server.verifyAuth, server.verificaPwdScaduta]
   }, async (request, reply) => {
     try {
       const tokenData = await server.getDataFromToken(request.query.token); // Recupera le informazioni presenti nel token

@@ -30,7 +30,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
         '200': responseInfoPersonali
       }
     },
-    onRequest: server.verifyAuth // Verifica la sessione dell'utenza
+    onRequest: [server.verifyAuth, server.verificaPwdScaduta] // Verifica la sessione dell'utenza
   }, async (request, reply: FastifyReply): Promise<ResponseApi> => {
     try {
       const tokenData = server.getDataFromToken(request.query.token); // Recupera le informazioni contenute nel token jwt

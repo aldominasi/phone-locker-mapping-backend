@@ -40,7 +40,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
         '200': replySerialize
       }
     },
-    onRequest: server.verifyAuth // Verifica il token jwt restituito all'attod della login
+    onRequest: [server.verifyAuth, server.verificaPwdScaduta] // Verifica il token jwt restituito all'attod della login
   }, async (request, reply) => {
     try {
       const tokenData = await server.getDataFromToken(request.query.token); // Recupero le info dal token

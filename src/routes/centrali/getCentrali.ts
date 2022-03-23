@@ -26,7 +26,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions): P
           S.array().items(S.string())).raw({ nullable: true })
       }
     },
-    onRequest: server.verifyAuth
+    onRequest: [server.verifyAuth, server.verifyAuth]
   }, async (request, reply): Promise<ResponseApi> => {
     try {
       const centrali: string[] = (await armadiSchema.aggregate([

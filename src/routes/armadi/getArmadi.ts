@@ -51,7 +51,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
         '200': responseArmadio // Serializzazione della risposta
       }
     },
-    preHandler: server.verifyAuth // Verifica la sessione dell'utenza
+    preHandler: [server.verifyAuth, server.verificaPwdScaduta] // Verifica la sessione dell'utenza
   }, async (request, reply): Promise<ResponseApi> => {
     try {
       const tokenData = await server.getDataFromToken(request.query.token);
@@ -90,7 +90,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
         '200': responsePagination // Serializzazione della risposta
       }
     },
-    preHandler: server.verifyAuth // Verifica la sessione dell'utenza
+    preHandler: [server.verifyAuth, server.verificaPwdScaduta] // Verifica la sessione dell'utenza
   }, async (request, reply): Promise<ResponseApi> => {
     try {
       const tokenData = await server.getDataFromToken(request.query.token);
