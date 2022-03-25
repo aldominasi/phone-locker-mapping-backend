@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
+import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import { ResponseApi } from '../../models/ResponseApi';
 import utentiSchema from '../../entities/utenti/utenti.schema';
 import IUtenti from '../../entities/utenti/utenti.interface';
@@ -7,6 +7,8 @@ import ResponseApiSerialization from '../../schemas/serializations/responseApi.s
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
 import { IQuerystringJwt } from '../../plugins/jwtHandler';
 import { hash } from 'bcryptjs';
+import { DateTime } from 'luxon';
+
 const regexPassword = /^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9]).{6,})\S$/;
 
 enum Errore {
@@ -52,7 +54,10 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
         return new ResponseApi(null, false, MSG_ERROR_DEFAULT, Errore.UTENTE_NON_TROVATO);
       const nuovaPassword: string = await hash(request.body.pwd, parseInt(process.env.SALT_PWD as string)); // Eseguo l'hash della nuova password
       await utentiSchema.findByIdAndUpdate(tokenData.id, {
-        $set: { password: nuovaPassword }
+        $set: {
+          password: nuovaPassword,
+          modPwdData: DateTime.local().toJSDate()
+        }
       }).exec(); // Eseguo l'update della password
       return new ResponseApi('La password è stata modificata correttamente');
     } catch (ex) {
