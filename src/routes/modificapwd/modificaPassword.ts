@@ -7,6 +7,7 @@ import modificaPwdSerialization from '../../schemas/serializations/modificaPwd.s
 import IUtenti from '../../entities/utenti/utenti.interface';
 import utentiSchema from '../../entities/utenti/utenti.schema';
 import { hash, compare } from 'bcryptjs';
+import { DateTime } from 'luxon';
 
 enum Errore {
   GENERICO = 'ERR_MOD_PWD_1',
@@ -56,7 +57,10 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
         return new ResponseApi(null, false, 'I dati non sono corretti', Errore.PWD_ERRATA);
       const nuovaPassword: string = await hash(request.body.newPwd, parseInt(process.env.SALT_PWD as string));
       await utentiSchema.findByIdAndUpdate(tokenData.id, {
-        $set: { password: nuovaPassword }
+        $set: {
+          password: nuovaPassword,
+          modPwdData: DateTime.local().toJSDate()
+        }
       }).exec();
       return new ResponseApi('La password è stata modificata correttamente');
     } catch (ex) {
