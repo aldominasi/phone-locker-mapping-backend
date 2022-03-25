@@ -6,6 +6,11 @@ import { compare } from 'bcryptjs';
 import { bodyLogin } from '../../schemas/validations/login.validation';
 import { responseLogin } from '../../schemas/serializations/login.serialization';
 
+enum Errore {
+  GENERICO = 'ERR_LOGIN_1',
+  CREDENZIALI_ERRATE = 'ERR_LOGIN_2'
+}
+
 // Body della request per eseguire la login
 interface IBody {
   email: string;
@@ -16,9 +21,8 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
   /*
   REST API per effettuare l'accesso alle funzionalità messe a disposizione dalla piattaforma'
   Codici di errore:
-  1 - Errore generico
-  2 - Utente non trovato (l'email non è presente nel db)
-  3 - La password inserita dall'utente non è corretta
+  ERR_LOGIN_1 - Errore generico
+  ERR_LOGIN_2 - Credenziali errate
    */
   server.post<{
     Body: IBody
@@ -37,10 +41,10 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       const { email, password } = request.body; //Recupero l'email e la password inviate dal client
       const utente = await utentiSchema.findOne({ email: email }).exec(); // Cerco l'utente utilizzando i dati ricevuti dal client
       if (utente == null) // Utente non trovato
-        return new ResponseApi(null, false, 'Username o password non corretti', 2);
+        return new ResponseApi(null, false, 'Username o password non corretti', Errore.CREDENZIALI_ERRATE);
       const pwdIsCorrect: boolean = await compare(password, utente.password); // controllo se la password è corretta
       if (!pwdIsCorrect) // Password non corretta
-        return new ResponseApi(null, false, 'Username o password non corretti', 3);
+        return new ResponseApi(null, false, 'Username o password non corretti', Errore.CREDENZIALI_ERRATE);
       const signIn = server.signAuth({ // Firma del JWT contenente l'id dell'utente
         id: utente._id.toString()
       }, 3600); // expire in 1 hour
@@ -50,7 +54,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       });
     } catch (ex) {
       server.log.error(ex);
-      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 1);
+      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, Errore.GENERICO);
     }
   });
 };

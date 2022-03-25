@@ -9,6 +9,12 @@ import { IQuerystringJwt } from '../../plugins/jwtHandler';
 import { hash } from 'bcryptjs';
 const regexPassword = /^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9]).{6,})\S$/;
 
+enum Errore {
+  GENERICO = 'ERR_MOD_PWD_1',
+  INFO_UTENTE = 'ERR_MOD_PWD_2',
+  UTENTE_NON_TROVATO = 'ERR_MOD_PWD_3'
+}
+
 interface IBodyModPwd {
   pwd: string;
 }
@@ -17,10 +23,9 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
   /*
   REST API per modificare la password dopo aver ricevuto la mail
   Codici di errore:
-  1 - Errore generico
-  2 - Token non valido o scaduto
-  3 - Errore nel recupero delle informazioni presenti nel token
-  4 - Utente non trovato
+  ERR_MOD_PWD_1 - Errore generico
+  ERR_MOD_PWD_2 - Errore nel recupero delle informazioni presenti nel token
+  ERR_MOD_PWD_3 - Utente non trovato
    */
   server.post<{
     Querystring: IQuerystringJwt,
@@ -41,10 +46,10 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     try {
       const tokenData = await server.getDataFromToken(request.query.token); // Recupero le informazioni dal token
       if (tokenData == null)
-        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 3);
+        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, Errore.INFO_UTENTE);
       const utente: IUtenti | null = await utentiSchema.findById(tokenData.id).exec(); // Recupera l'utenza
       if (utente == null)
-        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 4);
+        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, Errore.UTENTE_NON_TROVATO);
       const nuovaPassword: string = await hash(request.body.pwd, parseInt(process.env.SALT_PWD as string)); // Eseguo l'hash della nuova password
       await utentiSchema.findByIdAndUpdate(tokenData.id, {
         $set: { password: nuovaPassword }
@@ -52,7 +57,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       return new ResponseApi('La password è stata modificata correttamente');
     } catch (ex) {
       server.log.error(ex);
-      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 1);
+      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, Errore.GENERICO);
     }
   });
 };

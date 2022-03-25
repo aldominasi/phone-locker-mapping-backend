@@ -6,16 +6,29 @@ import { IQuerystringJwt } from './jwtHandler';
 import { ResponseApi } from '../models/ResponseApi';
 
 const DAYS = 90;
+enum Errore {
+  GENERICO = 'ERR_PWD_1',
+  INFO_UTENTE = 'ERR_PWD_2',
+  UTENTE_NON_TROVATO = 'ERR_PWD_3',
+  PWD_SCADUTA = 'ERR_PWD_4'
+}
 
+/**
+ * Codici di errore per la verifica della pwd:
+ * ERR_PWD_1 - Errore generico
+ * ERR_PWD_2 - Errore nel recupero delle informazioni dal token
+ * ERR_PWD_3 - Utente non trovato
+ * ERR_PWD_4 - Password scaduta
+ */
 export default fp(async (server: FastifyInstance, options: FastifyPluginOptions) => {
   server.decorate('verificaPwdScaduta', async (request: FastifyRequest<{ Querystring: IQuerystringJwt }>, reply: FastifyReply): Promise<void> => {
     try {
       const tokenData = await server.getDataFromToken(request.query.token);
       if (tokenData == null)
-        return reply.status(200).send(new ResponseApi(null, false, 'Il servizio non è al momento disponibile', 3));
+        return reply.status(200).send(new ResponseApi(null, false, 'Il servizio non è al momento disponibile', Errore.INFO_UTENTE));
       const utente = await utentiSchema.findById(tokenData?.id);
       if (utente == null)
-        return reply.status(200).send(new ResponseApi(null, false, 'Il servizio non è al momento disponibile', 4));
+        return reply.status(200).send(new ResponseApi(null, false, 'Il servizio non è al momento disponibile', Errore.UTENTE_NON_TROVATO));
       const ultimaModifica = DateTime.fromJSDate(utente.modPwdData);
       const createdAt = DateTime.fromJSDate(utente.createdAt);
       /*
@@ -23,10 +36,10 @@ export default fp(async (server: FastifyInstance, options: FastifyPluginOptions)
       Inoltre controlla se sono passati più di 'DAYS' giorni dall'ultima modifica della password.
       */
       if (ultimaModifica.hasSame(createdAt, 'minute') || DateTime.local().diff(ultimaModifica, 'days').days >= DAYS)
-        return reply.status(200).send(new ResponseApi(null, false, 'Il servizio non è al momento disponibile', 5));
+        return reply.status(200).send(new ResponseApi(null, false, 'Il servizio non è al momento disponibile', Errore.PWD_SCADUTA));
     } catch (ex) {
       server.log.error(ex);
-      return reply.status(200).send(new ResponseApi(null, false, 'Il servizio non è al momento disponibile', 1));
+      return reply.status(200).send(new ResponseApi(null, false, 'Il servizio non è al momento disponibile', Errore.GENERICO));
     }
   });
 });

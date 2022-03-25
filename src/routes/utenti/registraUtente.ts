@@ -10,15 +10,21 @@ import ruoliSchema from '../../entities/ruoli/ruoli.schema';
 import { bodyVal, queryVal } from '../../schemas/validations/registraUtente.validation';
 import serializeReply from '../../schemas/serializations/registraUtente.serialization';
 
+enum Errore {
+  GENERICO = 'ERR_NEW_USR_1',
+  INFO_UTENTE = 'ERR_NEW_USR_2',
+  PERMESSI = 'ERR_NEW_USR_3',
+  RUOLO_NON_TROVATO = 'ERR_NEW_USR_4'
+}
+
 export default async (server: FastifyInstance, options: FastifyPluginOptions) => {
   /*
   REST API per registrare un nuovo utente
   Codici di errore:
-  1 - Errore generico
-  2 - Token non valido o scaduto
-  3 - Errore nel recupero delle informazioni presenti nel token
-  4 - L'utente non ha il permesso di accedere all'API
-  5 - Il ruolo presente nel payload della richiesta non è valido
+  ERR_NEW_USR_1 - Errore generico
+  ERR_NEW_USR_2 - Errore nel recupero delle informazioni presenti nel token
+  ERR_NEW_USR_3 - L'utente non ha il permesso di accedere all'API
+  ERR_NEW_USR_4 - Il ruolo presente nel payload della richiesta non è valido
    */
   server.post<{
     Querystring: IQuerystringJwt,
@@ -39,13 +45,13 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     try {
       const tokenData = await server.getDataFromToken(request.query.token); // Recupero le info presenti nel token
       if (tokenData == null)
-        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 3);
+        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, Errore.INFO_UTENTE);
       const permesso = await server.verificaPermessi(tokenData.id, 'writeUtenti'); // Controllo i permessi dell'utente
       if (!permesso)
-        return new ResponseApi(null, false, "Accesso non autorizzato", 4);
+        return new ResponseApi(null, false, "Accesso non autorizzato", Errore.PERMESSI);
       const ruoloDaAssegnare: IRuoli | null = await ruoliSchema.findById(request.body.ruolo).exec(); // Controllo che il ruolo inviato sia valido
       if (ruoloDaAssegnare == null)
-        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 5);
+        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, Errore.RUOLO_NON_TROVATO);
       const pwd: string = server.createPwd(6, true, false); // Genera in maniera pseudo-casuale la password da inviare per email
       request.body.password = await hash(pwd, parseInt(process.env.SALT_PWD ?? '8')); // Esegue l'encrypt della password per salvare nel db
       const utente: IUtenti = {
@@ -61,7 +67,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       return new ResponseApi(utenteCreato); // Risposta inviata al client
     } catch (ex) {
       server.log.error(ex);
-      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 1);
+      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, Errore.GENERICO);
     }
   });
 };

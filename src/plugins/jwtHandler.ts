@@ -12,6 +12,9 @@ export interface IQuerystringJwt {
 }
 
 const seedJwt: string = process.env.SEED_JWT_TOKEN as string;
+enum Errore {
+  JWT_ERR = 'ERR_JWT_1'
+}
 
 const jwtHandler: FastifyPluginAsync = async function (server: FastifyInstance) {
   try {
@@ -36,7 +39,7 @@ async function verifyAuth (request: FastifyRequest<{ Querystring: IQuerystringJw
     });
   } catch (ex) {
     console.error(ex);
-    return reply.status(200).send(new ResponseApi(null, false, 'Il servizio non è al momento disponibile', 1));
+    return reply.status(200).send(new ResponseApi(null, false, 'Il servizio non è al momento disponibile', Errore.JWT_ERR));
   }
 }
 

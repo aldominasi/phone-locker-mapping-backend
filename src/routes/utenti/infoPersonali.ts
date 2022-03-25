@@ -8,15 +8,21 @@ import { responseInfoPersonali } from '../../schemas/serializations/infoPersonal
 import { IRuoli, IPermessi } from '../../entities/ruoli/ruoli.interface';
 import ruoliSchema from '../../entities/ruoli/ruoli.schema';
 
+enum Errore {
+  GENERICO = 'ERR_ME_1',
+  INFO_UTENTE = 'ERR_ME_2',
+  UTENTE_NON_TROVATO = 'ERR_ME_3',
+  RUOLO_NON_TROVATO = 'ERR_ME_4'
+}
+
 export default async (server: FastifyInstance, options: FastifyPluginOptions) => {
   /*
   REST API per recuperare le info dell'utente
   Codici di errore:
-  1 - Errore generico
-  2 - Token non valido o scaduto
-  3 - Errore nel recupero delle informazioni presenti nel token
-  4 - Utente non trovato
-  5 - Il ruolo associato all'utente non è presente in piattaforma
+  ERR_ME_1 - Errore generico
+  ERR_ME_2 - Errore nel recupero delle informazioni presenti nel token
+  ERR_ME_3 - Utente non trovato
+  ERR_ME_4 - Il ruolo associato all'utente non è presente in piattaforma
    */
   server.get<{
     Querystring: IQuerystringJwt
@@ -35,20 +41,20 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     try {
       const tokenData = server.getDataFromToken(request.query.token); // Recupera le informazioni contenute nel token jwt
       if (tokenData == null) // Informazioni non recuperate
-        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 3);
+        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, Errore.INFO_UTENTE);
       const utente = await utentiSchema.findById(tokenData.id, {_id: 0, password: 0}).exec(); // Recupera l'utente
       if (utente == null) // Utente non trovato
-        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 4);
+        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, Errore.UTENTE_NON_TROVATO);
       const ruolo: IRuoli | null = await ruoliSchema.findById(utente.ruolo).exec();
       if (ruolo == null) // Ricerco il ruolo nella collection ruolis per recuperare le info associate al ruolo dell'utente
-        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 5);
+        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, Errore.RUOLO_NON_TROVATO);
       return new ResponseApi({
         ...utente.toObject(),
         permessi: ruolo.permessi
       }); // Risposta inviata al client
     } catch (ex) {
       server.log.error(ex);
-      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 1);
+      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, Errore.GENERICO);
     }
   });
 };

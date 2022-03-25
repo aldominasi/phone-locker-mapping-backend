@@ -7,6 +7,12 @@ import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
 import queryValidation from '../../schemas/validations/utenti.validation';
 import replySerialize from '../../schemas/serializations/utenti.serialization';
 
+enum Errore {
+  GENERICO = 'ERR_USR_1',
+  INFO_UTENTE = 'ERR_USR_2',
+  PERMESSI = 'ERR_USR_3'
+}
+
 interface IQuery extends IQuerystringJwt { // Interfaccia per la querystring della request
   page: number; // Numero di pagina
   limit: number; // Numero degli elementi per pagina
@@ -23,10 +29,9 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
   /*
   REST API per recuperare la lista degli utenti
   Codici di errore:
-  1 - Errore generico
-  2 - Token non valido o scaduto
-  3 - Errore nel recupero delle informazioni presenti nel token
-  4 - L'utente non ha il permesso di accedere all'API
+  ERR_USR_1 - Errore generico
+  ERR_USR_2 - Errore nel recupero delle informazioni presenti nel token
+  ERR_USR_3 - L'utente non ha il permesso di accedere all'API
    */
   server.get<{
     Querystring: IQuery
@@ -45,10 +50,10 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     try {
       const tokenData = await server.getDataFromToken(request.query.token); // Recupero le info dal token
       if (tokenData == null)
-        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 3);
+        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, Errore.INFO_UTENTE);
       const permesso = await server.verificaPermessi(tokenData.id, 'readUtenti'); // Controllo i permessi dell'utente
       if (!permesso)
-        return new ResponseApi(null, false, 'Accesso non autorizzato', 4);
+        return new ResponseApi(null, false, 'Accesso non autorizzato', Errore.PERMESSI);
       // Creo la query con i dati presenti nella richiesta
       const query: IQueryUtenti = {};
       if (request.query.email != null)
@@ -71,7 +76,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       });
     } catch (ex) {
       server.log.error(ex);
-      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 1);
+      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, Errore.GENERICO);
     }
   });
 };

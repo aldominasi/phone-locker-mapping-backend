@@ -7,6 +7,12 @@ import { PipelineStage } from 'mongoose';
 import S from 'fluent-json-schema';
 import ResponseApiSerialization from '../../schemas/serializations/responseApi.serialization';
 
+enum Errore {
+  GENERICO = 'ERR_ZONE_1',
+  INFO_UTENTE = 'ERR_ZONE_2',
+  PERMESSI = 'ERR_ZONE_3'
+}
+
 interface IQuery extends IQuerystringJwt {
   centrale?: string;
 }
@@ -15,10 +21,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
   /*
   REST API per recuperare la lista delle zone
   Codici di errore:
-  1 - Errore generico
-  2 - Token non valido o scaduto
-  3 - Errore nel recupero delle informazioni presenti nel token
-  4 - L'utente non ha il permesso di accedere all'API
+  ERR_ZONE_1 - Errore generico
    */
   server.get<{
     Querystring: IQuery
@@ -44,7 +47,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       return new ResponseApi(zone);
     } catch (ex) {
       server.log.error(ex);
-      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 1);
+      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, Errore.GENERICO);
     }
   });
 };

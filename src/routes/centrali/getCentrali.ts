@@ -6,12 +6,15 @@ import S from 'fluent-json-schema';
 import ResponseApiSerialization from '../../schemas/serializations/responseApi.serialization';
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
 
+enum Errore {
+  GENERICO = 'ERR_CEN_1'
+}
+
 export default async (server: FastifyInstance, options: FastifyPluginOptions): Promise<void> => {
   /*
   REST API per recuperare la lista delle centrali presenti nel db
   Codici di errore:
-  1 - Errore generico
-  2 - Token non valido o scaduto
+  ERR_CEN_1 - Errore generico
    */
   server.get<{
     Querystring: IQuerystringJwt
@@ -26,7 +29,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions): P
           S.array().items(S.string())).raw({ nullable: true })
       }
     },
-    onRequest: [server.verifyAuth, server.verifyAuth]
+    onRequest: [server.verifyAuth, server.verificaPwdScaduta]
   }, async (request, reply): Promise<ResponseApi> => {
     try {
       const centrali: string[] = (await armadiSchema.aggregate([
@@ -35,7 +38,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions): P
       return new ResponseApi(centrali);
     } catch (ex) {
       server.log.error(ex);
-      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, 1);
+      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, Errore.GENERICO);
     }
   });
 };
