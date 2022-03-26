@@ -32,6 +32,7 @@ const armadiSchema: Schema = new Schema<IArmadi>({
     type: {
       type: String,
       enum: ['Point'],
+      index: '2dsphere',
       required: true
     },
     coordinates: {
