@@ -11,7 +11,7 @@ const connectToDb: FastifyPluginAsync = async function (server: FastifyInstance)
       server.log.error('connessione al db persa');
     });
     if (process.env.DEVELOPMENT) {
-      await mongoose.connect('mongodb://127.0.0.1:27017/plmdb', {
+      await mongoose.connect('mongodb://192.168.178.29:27017/plmdb', {
         autoIndex: true
       });
     }

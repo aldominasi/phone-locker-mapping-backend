@@ -7,6 +7,10 @@ export default interface IArmadi {
   };
   tipoArmadio: string;
   indirizzo: string;
+  localizzazione: {
+    type: string;
+    coordinates: number[];
+  };
   nota: string;
   createdAt: Date;
   updatedAt: Date;

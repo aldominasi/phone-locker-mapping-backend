@@ -17,7 +17,7 @@ const armadiSchema: Schema = new Schema<IArmadi>({
     },
     info2: {
       type: String,
-      required: true
+      default: ''
     }
   },
   tipoArmadio: {
@@ -27,6 +27,17 @@ const armadiSchema: Schema = new Schema<IArmadi>({
   indirizzo: {
     type: String,
     required: true
+  },
+  localizzazione: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      required: true
+    },
+    coordinates: {
+      type: [Number],
+      required: true
+    }
   },
   nota: {
     type: String,
