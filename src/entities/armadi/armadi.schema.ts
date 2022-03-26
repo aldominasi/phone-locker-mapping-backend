@@ -37,8 +37,7 @@ const armadiSchema: Schema = new Schema<IArmadi>({
     coordinates: {
       type: [Number],
       required: true
-    },
-    index: '2dsphere'
+    }
   },
   nota: {
     type: String,
@@ -46,6 +45,10 @@ const armadiSchema: Schema = new Schema<IArmadi>({
   }
 }, {
   timestamps: true
+});
+
+armadiSchema.index({
+  localizzazione: '2dsphere'
 });
 
 export default model<IArmadi>('armadi', armadiSchema);
