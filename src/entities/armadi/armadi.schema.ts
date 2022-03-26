@@ -35,7 +35,7 @@ const armadiSchema: Schema = new Schema<IArmadi>({
       required: true
     },
     coordinates: {
-      type: [Number],
+      type: [Number, Number],
       required: true
     }
   },
