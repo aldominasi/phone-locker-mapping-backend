@@ -5,6 +5,8 @@ import { IQuerystringJwt } from '../../plugins/jwtHandler';
 import { ResponseApi} from '../../models/ResponseApi';
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
 import { UpdateQuery } from 'mongoose';
+import { paramsVal, bodyPatchVal } from '../../schemas/validations/aggiornaArmadio.validation';
+import { patchSerialization } from '../../schemas/serializations/aggiornaArmadio.serialization';
 
 const regexFieldPatchNoProtected = /(nota)|(coordinates)/;
 enum ErrorePatch {
@@ -49,6 +51,13 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     constraints: {
       version: '1.0.0'
     },
+    schema: {
+      params: paramsVal,
+      body: bodyPatchVal,
+      response: {
+        '200': patchSerialization
+      }
+    },
     preHandler: [ server.verifyAuth, server.verificaPwdScaduta] // Verifica la sessione dell'utente e la scadenza della sua pwd
   }, async (request, reply) => {
     try {
@@ -67,9 +76,6 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
             break;
         }
       }
-      // const armadio = await armadiSchema.findById(request.params.id).exec(); // Recupero le informazioni dell'armadio
-      // if (armadio == null)
-      //   return new ResponseApi(null, false, 'Armadio non trovato', ErrorePatch.ARMADIO_NON_TROVATO);
       // Eseguo le operazioni
       const query: UpdateQuery<IArmadi> = {};
       query.$set= {};
