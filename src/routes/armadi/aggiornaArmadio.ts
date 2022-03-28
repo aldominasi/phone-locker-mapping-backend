@@ -58,6 +58,10 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
         '200': patchSerialization
       }
     },
+    onRequest: async (request, reply) => {
+      if (request.headers['content-type'] !== 'application/json-patch+json')
+        return reply.code(415).send('La richiesta non può essere elaborata');
+    },
     preHandler: [ server.verifyAuth, server.verificaPwdScaduta] // Verifica la sessione dell'utente e la scadenza della sua pwd
   }, async (request, reply) => {
     try {
