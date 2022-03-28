@@ -5,17 +5,24 @@ import { IQuerystringJwt } from '../../plugins/jwtHandler';
 import { ResponseApi} from '../../models/ResponseApi';
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
 import { UpdateQuery } from 'mongoose';
-import { paramsVal, bodyPatchVal } from '../../schemas/validations/aggiornaArmadio.validation';
-import { patchSerialization } from '../../schemas/serializations/aggiornaArmadio.serialization';
+import { paramsVal, bodyPatchVal, bodyPutVal } from '../../schemas/validations/aggiornaArmadio.validation';
+import { responseSer } from '../../schemas/serializations/aggiornaArmadio.serialization';
 
 const regexFieldPatchNoProtected = /(nota)|(coordinates)/;
+
 enum ErrorePatch {
   GENERICO = 'ERR_PATCH_ARM_1',
   INFO_UTENTE = 'ERR_PATCH_ARM_2',
   PERMESSI = 'ERR_PATCH_ARM_3',
-  ARMADIO_NON_TROVATO = 'ERR_PATCH_ARM_4',
+  //ARMADIO_NON_TROVATO = 'ERR_PATCH_ARM_4',
   OPERAZIONE_NON_VALIDA = 'ERR_PATCH_ARM_5',
   OPERAZIONE_NON_RIUSCITA = 'ERR_PATCH_ARM_6',
+}
+
+enum ErrorePut {
+  GENERICO = 'ERR_PUT_ARM_1',
+  INFO_UTENTE = 'ERR_PUT_ARM_2',
+  PERMESSI = 'ERR_PUT_ARM_3',
 }
 
 enum OperationsPatch {
@@ -55,7 +62,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       params: paramsVal,
       body: bodyPatchVal,
       response: {
-        '200': patchSerialization
+        '200': responseSer
       }
     },
     onRequest: async (request, reply) => {
@@ -99,6 +106,44 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     } catch (ex) {
       server.log.error(ex);
       return new ResponseApi(null, false, MSG_ERROR_DEFAULT, ErrorePatch.GENERICO);
+    }
+  });
+  /*
+  REST API per eseguire l'update dell'intero documento di un armadio
+  Codici di errore:
+  ERR_PUT_ARM_1 - Errore generico
+  ERR_PUT_ARM_2 - Errore nel recupero delle informazioni presenti nel token
+  ERR_PUT_ARM_3 - L'utente non ha il permesso di accedere all'API
+   */
+  server.put<{
+    Querystring: IQuerystringJwt,
+    Params: IParams,
+    Body: IArmadi
+  }>('/:id', {
+    constraints: {
+      version: '1.0.0'
+    },
+    schema: {
+      params: paramsVal,
+      body: bodyPutVal,
+      response: {
+        '200': responseSer
+      }
+    },
+    preHandler: [ server.verifyAuth, server.verificaPwdScaduta ] // Verifica la sessione dell'utente e la scadenza della sua pwd
+  }, async (request, reply) => {
+    try {
+      const tokenData = await server.getDataFromToken(request.query.token);
+      if (tokenData == null)
+        return new ResponseApi(null, false, MSG_ERROR_DEFAULT, ErrorePut.INFO_UTENTE);
+      const permessi = await server.verificaPermessi(tokenData.id, 'writeArmadi');
+      if (!permessi)
+        return new ResponseApi(null, false, 'Accesso non autorizzato', ErrorePut.PERMESSI);
+      const result = await armadiSchema.findByIdAndUpdate(request.params.id, request.body, { new: true }).exec();
+      return new ResponseApi(result);
+    } catch (ex) {
+      server.log.error(ex);
+      return new ResponseApi(null, false, MSG_ERROR_DEFAULT, ErrorePut.GENERICO);
     }
   });
 };

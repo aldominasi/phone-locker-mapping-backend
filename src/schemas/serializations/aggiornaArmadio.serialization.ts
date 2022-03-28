@@ -17,5 +17,5 @@ const armadio = S.object()
   )
   .prop('nota', S.string().default(''));
 
-export const patchSerialization = ResponseApiSerialization
+export const responseSer = ResponseApiSerialization
   .prop('data', armadio.raw({ nullable: true }));
