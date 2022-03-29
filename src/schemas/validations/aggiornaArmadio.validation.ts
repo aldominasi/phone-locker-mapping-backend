@@ -1,17 +1,17 @@
 import S from 'fluent-json-schema';
 
 const armadio = S.object()
-  .prop('centrale', S.string())
-  .prop('progressivo', S.integer())
+  .prop('centrale', S.string().required())
+  .prop('progressivo', S.integer().required())
   .prop('zona', S.object()
-    .prop('info1', S.string())
-    .prop('info2', S.string())
+    .prop('info1', S.string().required())
+    .prop('info2', S.string().default(''))
   )
-  .prop('tipoArmadio', S.string())
-  .prop('indirizzo', S.string())
+  .prop('tipoArmadio', S.string().required())
+  .prop('indirizzo', S.string().required())
   .prop('localizzazione', S.object()
-    .prop('type', S.string())
-    .prop('coordinates', S.array().items(S.number()))
+    .prop('type', S.string()).required().enum(['Point'])
+    .prop('coordinates', S.array().items(S.number()).minItems(2).maxItems(2))
   )
   .prop('nota', S.string().default(''));
 
