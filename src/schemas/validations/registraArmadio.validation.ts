@@ -1,7 +1,10 @@
 import S from 'fluent-json-schema';
 
 export const bodyVal = S.object()
-  .prop('centrale', S.string().required())
+  .prop('centrale', S.object()
+    .prop('codice', S.string())
+    .prop('nome', S.string())
+  )
   .prop('progressivo', S.number().required())
   .prop('zona',
     S.object()

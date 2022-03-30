@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
-import IArmadi from '../../entities/armadi/armadi.interface';
 import armadiSchema from '../../entities/armadi/armadi.schema';
+import comuniSchema from '../../entities/comuni/comuni.schema';
 import { IQuerystringJwt } from '../../plugins/jwtHandler';
 import { ResponseApi } from '../../models/ResponseApi';
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
@@ -10,7 +10,27 @@ import serializeReply from '../../schemas/serializations/registraArmadio.seriali
 enum Errore {
   GENERICO = 'ERR_ARM_1',
   INFO_UTENTE = 'ERR_ARM_2',
-  PERMESSI = 'ERR_ARM_3'
+  PERMESSI = 'ERR_ARM_3',
+  COMUNE_NON_TROVATO = 'ERR_ARM_4',
+}
+
+interface IBody {
+  centrale: {
+    codice: string;
+    nome: string;
+  };
+  progressivo: number;
+  zona: {
+    info1: string;
+    info: string;
+  };
+  tipoArmadio: string;
+  indirizzo: string;
+  localizzazione: {
+    type: string;
+    coordinates: string;
+  };
+  nota: string;
 }
 
 export default async (server: FastifyInstance, options: FastifyPluginOptions) => {
@@ -23,7 +43,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
    */
   server.post<{
     Querystring: IQuerystringJwt,
-    Body: IArmadi
+    Body: IBody
   }>('/', {
     constraints: {
       version: '1.0.0'
@@ -44,7 +64,13 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       const permesso: boolean = await server.verificaPermessi(tokenData.id, 'writeArmadi'); // Verifica i permessi dell'utente
       if (!permesso)
         return new ResponseApi(null, false, 'Accesso non autorizzato', Errore.PERMESSI); // L'utente non ha i permessi per accedere all'API
-      const result = await armadiSchema.create(request.body); // Registra nel db i dati del nuovo armadio presenti nel payload della richiesta
+      const comune = await comuniSchema.findOne({ codice: request.body.centrale.codice }).exec();
+      if (comune == null)
+        return new ResponseApi(null, false, 'La richiesta non può essere elaborata', Errore.COMUNE_NON_TROVATO);
+      const result = await armadiSchema.create({
+        ...request.body,
+        centrale: comune.nome
+      }); // Registra nel db i dati del nuovo armadio presenti nel payload della richiesta
       return reply.code(201).send(new ResponseApi(result));
     } catch (ex) {
       server.log.error(ex);
