@@ -41,7 +41,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     try {
       const filtri: PipelineStage[] = [{ $group: { _id: '$zona.info1' } }]; // Pipeline per il raggruppamento
       if (request.query.centrale) // Se il filtro centrale è presente nella richiesta aggiungo la pipeline match
-        filtri.unshift({ $match: { centrale: request.query.centrale } });
+        filtri.unshift({ $match: { centrale: { $regex: `^${request.query.centrale}$`, $options: 'i' } } });
       // Recupero le zone ed eseguo un remapping dei dati per restituire la lista nel formato atteso dal client
       const zone: string[] = (await armadiSchema.aggregate(filtri).exec()).map(item => item._id);
       return new ResponseApi(zone);
