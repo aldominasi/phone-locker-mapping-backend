@@ -18,7 +18,7 @@ const armadio = S.object()
   .prop('nota', S.string().default(''));
 
 export const responseArmadio = responseApiSerialization
-  .prop('data', armadio.raw({ nullable: true }));
+  .prop('data', armadio).raw({ nullable: true });
 
 export const responsePagination = responseApiSerialization
   .prop('data', S.object()
