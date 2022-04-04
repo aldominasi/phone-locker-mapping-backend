@@ -2,7 +2,19 @@ import { model, Schema } from 'mongoose';
 import IArmadi from './armadi.interface';
 
 const armadiSchema: Schema = new Schema<IArmadi>({
+  codiceCentrale: {
+    type: String,
+    required: true
+  },
   centrale: {
+    type: String,
+    required: true
+  },
+  provincia: {
+    type: String,
+    required: true
+  },
+  codiceProvincia: {
     type: String,
     required: true
   },

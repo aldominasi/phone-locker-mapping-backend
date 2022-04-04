@@ -3,7 +3,10 @@ import responseApiSerialization from './responseApi.serialization';
 
 const armadio = S.object()
   .prop('_id', S.string())
+  .prop('codiceCentrale', S.string())
   .prop('centrale', S.string())
+  .prop('provincia', S.string())
+  .prop('codiceProvincia', S.string())
   .prop('progressivo', S.integer())
   .prop('zona', S.object()
     .prop('info1', S.string())

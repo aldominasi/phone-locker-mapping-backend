@@ -1,7 +1,10 @@
 import S from 'fluent-json-schema';
 
 const armadio = S.object()
+  .prop('codiceCentrale', S.string().required())
   .prop('centrale', S.string().required())
+  .prop('provincia', S.string().required())
+  .prop('codiceProvincia', S.string().required())
   .prop('progressivo', S.integer().required())
   .prop('zona', S.object()
     .prop('info1', S.string().required())

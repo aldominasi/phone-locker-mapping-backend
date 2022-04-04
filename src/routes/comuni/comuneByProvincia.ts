@@ -34,7 +34,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions): P
         { $sort: { nome: 1 } }
       ]).exec();
       return new ResponseApi(comuni.map(item => {
-        return { codice: item._id, nome: item.nome };
+        return { codice: item.codice, nome: item.nome };
       }));
     } catch (ex) {
       server.log.error(ex);
