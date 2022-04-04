@@ -10,6 +10,11 @@ enum Errore {
   GENERICO = 'ERR_CEN_1'
 }
 
+interface ICentraleResponse {
+  codice: string;
+  nome: string;
+}
+
 export default async (server: FastifyInstance, options: FastifyPluginOptions): Promise<void> => {
   /*
   REST API per recuperare la lista delle centrali presenti nel db
@@ -26,15 +31,19 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions): P
       querystring: S.object().prop('token', S.string().required()),
       response: {
         '200': ResponseApiSerialization.prop('data',
-          S.array().items(S.string())).raw({ nullable: true })
+          S.array().items(
+            S.object()
+              .prop('codice', S.string())
+              .prop('nome', S.string())
+          )).raw({ nullable: true })
       }
     },
     onRequest: [server.verifyAuth, server.verificaPwdScaduta]
   }, async (request, reply): Promise<ResponseApi> => {
     try {
-      const centrali: string[] = (await armadiSchema.aggregate([
-        { $group: { _id: '$centrale' } }
-      ]).exec()).map(centrale => centrale._id);
+      const centrali: ICentraleResponse[] = (await armadiSchema.aggregate([
+        { $group: { _id: '$centrale.codice', nome: { $first: '$centrale.nome' } } }
+      ]).exec()).map(centrale => { return { codice: centrale._id, nome: centrale.nome }; });
       return new ResponseApi(centrali);
     } catch (ex) {
       server.log.error(ex);

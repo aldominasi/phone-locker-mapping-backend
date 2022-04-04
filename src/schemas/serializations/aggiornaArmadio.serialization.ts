@@ -3,7 +3,16 @@ import ResponseApiSerialization from './responseApi.serialization';
 
 const armadio = S.object()
   .prop('_id', S.string())
-  .prop('centrale', S.string())
+  .prop('centrale',
+    S.object()
+      .prop('codice', S.string())
+      .prop('nome', S.string())
+  )
+  .prop('provincia',
+    S.object()
+      .prop('codice', S.string())
+      .prop('nome', S.string())
+  )
   .prop('progressivo', S.integer())
   .prop('zona', S.object()
     .prop('info1', S.string())
@@ -18,4 +27,4 @@ const armadio = S.object()
   .prop('nota', S.string().default(''));
 
 export const responseSer = ResponseApiSerialization
-  .prop('data', armadio.raw({ nullable: true }));
+  .prop('data', armadio).raw({ nullable: true });

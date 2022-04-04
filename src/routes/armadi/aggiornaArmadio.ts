@@ -14,7 +14,6 @@ enum ErrorePatch {
   GENERICO = 'ERR_PATCH_ARM_1',
   INFO_UTENTE = 'ERR_PATCH_ARM_2',
   PERMESSI = 'ERR_PATCH_ARM_3',
-  //ARMADIO_NON_TROVATO = 'ERR_PATCH_ARM_4',
   OPERAZIONE_NON_VALIDA = 'ERR_PATCH_ARM_5',
   OPERAZIONE_NON_RIUSCITA = 'ERR_PATCH_ARM_6',
 }
@@ -23,6 +22,7 @@ enum ErrorePut {
   GENERICO = 'ERR_PUT_ARM_1',
   INFO_UTENTE = 'ERR_PUT_ARM_2',
   PERMESSI = 'ERR_PUT_ARM_3',
+  ARMADIO_NON_TROVATO = 'ERR_PATCH_ARM_4',
 }
 
 enum OperationsPatch {
@@ -114,6 +114,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
   ERR_PUT_ARM_1 - Errore generico
   ERR_PUT_ARM_2 - Errore nel recupero delle informazioni presenti nel token
   ERR_PUT_ARM_3 - L'utente non ha il permesso di accedere all'API
+  ERR_PUT_ARM_4 - Armadio non trovato
    */
   server.put<{
     Querystring: IQuerystringJwt,
@@ -140,6 +141,8 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       if (!permessi)
         return new ResponseApi(null, false, 'Accesso non autorizzato', ErrorePut.PERMESSI);
       const result = await armadiSchema.findByIdAndUpdate(request.params.id, request.body, { new: true }).exec();
+      if (result == null)
+        return new ResponseApi(null, false, 'Armadio non trovato', ErrorePut.ARMADIO_NON_TROVATO);
       return new ResponseApi(result);
     } catch (ex) {
       server.log.error(ex);

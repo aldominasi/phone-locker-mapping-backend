@@ -1,8 +1,12 @@
 export default interface IArmadi {
-  codiceCentrale: string;
-  centrale: string;
-  provincia: string;
-  codiceProvincia: string;
+  centrale: {
+    codice: string;
+    nome: string;
+  };
+  provincia: {
+    codice: string;
+    nome: string;
+  };
   progressivo: number;
   zona: {
     info1: string;

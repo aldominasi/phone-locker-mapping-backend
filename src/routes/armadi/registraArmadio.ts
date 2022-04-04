@@ -69,10 +69,10 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
         return new ResponseApi(null, false, 'La richiesta non può essere elaborata', Errore.COMUNE_NON_TROVATO);
       const result = await armadiSchema.create({
         ...request.body,
-        centrale: comune.nome,
-        codiceCentrale: comune.codice,
-        provincia: comune.provincia.nome,
-        codiceProvincia: comune.provincia.codice
+        provincia: {
+          nome: comune.provincia.nome,
+          codice: comune.provincia.codice
+        },
       }); // Registra nel db i dati del nuovo armadio presenti nel payload della richiesta
       return reply.code(201).send(new ResponseApi(result));
     } catch (ex) {

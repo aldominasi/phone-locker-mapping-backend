@@ -25,7 +25,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions): P
         { $sort: { 'nome': 1 } }
       ]).exec();
       return new ResponseApi(province.map(item => {
-        return { nome: item.nome, codice: item.codice };
+        return { nome: item.nome, codice: item._id };
       }));
     } catch (ex) {
       server.log.error(ex);
