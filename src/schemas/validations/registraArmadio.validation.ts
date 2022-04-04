@@ -2,8 +2,8 @@ import S from 'fluent-json-schema';
 
 export const bodyVal = S.object()
   .prop('centrale', S.object()
-    .prop('codice', S.string())
-    .prop('nome', S.string())
+    .prop('codice', S.string().required())
+    .prop('nome', S.string().required())
   )
   .prop('progressivo', S.number().required())
   .prop('zona',

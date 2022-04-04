@@ -1,7 +1,7 @@
 import fp from 'fastify-plugin';
 import {FastifyInstance, FastifyPluginAsync, FastifyReply, FastifyRequest} from 'fastify';
 import { ResponseApi } from '../models/ResponseApi';
-import {sign, verify, JwtPayload, decode } from 'jsonwebtoken';
+import {sign, verify, JwtPayload, decode, TokenExpiredError} from 'jsonwebtoken';
 
 interface CustomJwtPayload extends JwtPayload {
   id: string;
@@ -38,7 +38,8 @@ async function verifyAuth (request: FastifyRequest<{ Querystring: IQuerystringJw
       ignoreExpiration: false
     });
   } catch (ex) {
-    console.error(ex);
+    if (!(ex instanceof TokenExpiredError))
+      console.error(ex);
     return reply.status(200).send(new ResponseApi(null, false, 'Il servizio non è al momento disponibile', Errore.JWT_ERR));
   }
 }

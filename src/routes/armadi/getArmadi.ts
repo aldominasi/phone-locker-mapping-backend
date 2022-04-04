@@ -30,7 +30,10 @@ interface IQuery extends IQuerystringJwt { // Interfaccia delle querystring dell
 }
 
 interface IFiltroRicerca {
-  centrale?: string;
+  centrale?: {
+    $regex: string;
+    $options?: string;
+  };
   'zona.info1'?: string;
 }
 
@@ -106,7 +109,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
         return new ResponseApi(null, false, 'Accesso non autorizzato', Errore.PERMESSI);
       const filtri: IFiltroRicerca = {};
       if (request.query.centrale)
-        filtri.centrale = request.query.centrale;
+        filtri.centrale = { $regex: `^${request.query.centrale}$`, $options: 'i' };
       if (request.query.zona)
         filtri['zona.info1'] = request.query.zona;
       // Recupera la lista degli armadi secondo i parametri inviati dal client
