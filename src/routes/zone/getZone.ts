@@ -14,7 +14,7 @@ enum Errore {
 }
 
 interface IQuery extends IQuerystringJwt {
-  centrale?: string;
+  codiceCentrale?: string;
 }
 
 export default async (server: FastifyInstance, options: FastifyPluginOptions) => {
@@ -32,7 +32,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
     schema: {
       querystring: S.object()
         .prop('token', S.string().required())
-        .prop('centrale', S.string()),
+        .prop('codiceCentrale', S.string()),
       response: {
         '200': ResponseApiSerialization.prop('data', S.array().items(S.string())).raw({ nullable: true })
       }
@@ -40,8 +40,8 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
   }, async (request, reply): Promise<ResponseApi> => {
     try {
       const filtri: PipelineStage[] = [{ $group: { _id: '$zona.info1' } }]; // Pipeline per il raggruppamento
-      if (request.query.centrale) // Se il filtro centrale è presente nella richiesta aggiungo la pipeline match
-        filtri.unshift({ $match: { centrale: { $regex: `^${request.query.centrale}$`, $options: 'i' } } });
+      if (request.query.codiceCentrale) // Se il filtro centrale è presente nella richiesta aggiungo la pipeline match
+        filtri.unshift({ $match: { 'centrale.codice': request.query.codiceCentrale } });
       // Recupero le zone ed eseguo un remapping dei dati per restituire la lista nel formato atteso dal client
       const zone: string[] = (await armadiSchema.aggregate(filtri).exec()).map(item => item._id);
       return new ResponseApi(zone);
