@@ -8,7 +8,7 @@ export const paramsArmadi = S.object()
 
 export const queryArmadi = S.object()
   .prop('token', S.string().required())
-  .prop('centrale', S.string())
+  .prop('codiceCentrale', S.string())
   .prop('zona', S.string())
   .prop('page', S.integer().required())
   .prop('limit', S.integer().required());

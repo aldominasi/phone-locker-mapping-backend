@@ -25,15 +25,12 @@ interface IParams { // Interfaccia params della request
 interface IQuery extends IQuerystringJwt { // Interfaccia delle querystring della request
   page: number; // numero di pagina
   limit: number; // numero di item per pagina
-  centrale?: string; // filtro per la ricerca (nome della centrale)
+  codiceCentrale?: string; // filtro per la ricerca (nome della centrale)
   zona?: string;
 }
 
 interface IFiltroRicerca {
-  centrale?: {
-    $regex: string;
-    $options?: string;
-  };
+  'centrale.codice'?: string;
   'zona.info1'?: string;
 }
 
@@ -108,8 +105,8 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       if (!permesso)
         return new ResponseApi(null, false, 'Accesso non autorizzato', Errore.PERMESSI);
       const filtri: IFiltroRicerca = {};
-      if (request.query.centrale)
-        filtri.centrale = { $regex: `^${request.query.centrale}$`, $options: 'i' };
+      if (request.query.codiceCentrale)
+        filtri['centrale.codice'] = request.query.codiceCentrale;
       if (request.query.zona)
         filtri['zona.info1'] = request.query.zona;
       // Recupera la lista degli armadi secondo i parametri inviati dal client
