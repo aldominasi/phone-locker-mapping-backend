@@ -7,11 +7,7 @@ import ResponseApiSerialization from '../../../schemas/serializations/responseAp
 import S from "fluent-json-schema";
 
 enum Errore {
-  GENERICO = 'ERR_CEN_PROV_1'
-}
-
-interface IParams {
-  codice: string;
+  GENERICO = 'ERR_PROV_CEN_1'
 }
 
 export default async (server: FastifyInstance, options: FastifyPluginOptions): Promise<void> => {
@@ -22,15 +18,13 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions): P
   ERR_CEN_PROV_1 - Errore generico
    */
   server.get<{
-    Querystring: IQuerystringJwt,
-    Params: IParams
-  }>('/:codice', {
+    Querystring: IQuerystringJwt
+  }>('/', {
     constraints: {
       version: '1.0.0'
     },
     schema: {
       querystring: S.object().prop('token', S.string().required()),
-      params: S.object().prop('codice', S.string().required()),
       response: {
         '200': ResponseApiSerialization.prop('data',
           S.array().items(
@@ -43,18 +37,11 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions): P
     onRequest: [ server.verifyAuth, server.verificaPwdScaduta ]
   }, async (request, reply) => {
     try {
-      /*
-      Query per recuperare tutte le centrali presenti nel db effettuando un raggruppamento sul codice della centrale.
-      L'array è ordinato alfabeticamente sul campo nome della centrale
-      Codici di errore:
-      ERR_CEN_PROV_1 - Errore generico
-      */
-      const centrali = await armadiSchema.aggregate([
-        { $match: { 'provincia.codice': request.params.codice } },
-        { $group: { _id: '$centrale.codice', nome: { $first: '$centrale.nome' } } },
+      const province = await armadiSchema.aggregate([
+        { $group: { _id: '$provincia.codice', nome: { $first: '$provincia.nome' } } },
         { $sort: { nome: 1 } }
       ]).exec();
-      return new ResponseApi(centrali.map(item => {
+      return new ResponseApi(province.map(item => {
         return { codice: item._id, nome: item.nome };
       }));
     } catch (ex) {
