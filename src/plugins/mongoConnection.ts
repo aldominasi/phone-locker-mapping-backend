@@ -11,12 +11,12 @@ const connectToDb: FastifyPluginAsync = async function (server: FastifyInstance)
       server.log.error('connessione al db persa');
     });
     if (process.env.DEVELOPMENT) {
-      await mongoose.connect('mongodb://192.168.178.29:27017/plmdb', {
+      await mongoose.connect(`mongodb://${process.env.HOST_DB}/${process.env.MONGO_INITDB_DATABASE}`, {
         autoIndex: true
       });
     }
     else {
-      await mongoose.connect(`mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@${process.env.HOST_PLM}/${process.env.MONGO_INITDB_DATABASE}?authSource=admin`, {
+      await mongoose.connect(`mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@${process.env.HOST_DB}/${process.env.MONGO_INITDB_DATABASE}?authSource=${process.env.MONGO_INITDB_DATABASE}`, {
         autoIndex: true
       });
     }
