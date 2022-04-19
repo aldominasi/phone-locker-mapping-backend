@@ -22,7 +22,8 @@ const start = async (): Promise<void> => {
       });
     else
       await server.register(Env, {
-        schema: envValidation
+        schema: envValidation,
+        dotenv: { path: './.env' }
       });
     const PORT: number | string = process.env.PORT_PLM_BACKEND ?? 3000;
     await server.register(fastifyAutoload, {
