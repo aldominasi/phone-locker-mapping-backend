@@ -14,7 +14,7 @@ const corsAllowed: FastifyPluginAsync = async function (server: FastifyInstance)
         const hostname = new URL(origin).hostname;
         if (process.env.DEVELOPMENT != null)
           corsOptions = { origin: true };
-        else if (hostname === "localhost")
+        else if (hostname === getHostNameFromRegex(process.env.HOST_PLM as string))
           corsOptions = { origin: true };
         cb(null, corsOptions);
       };
@@ -23,5 +23,10 @@ const corsAllowed: FastifyPluginAsync = async function (server: FastifyInstance)
     server.log.error(ex);
   }
 };
+
+function getHostNameFromRegex(url: string) {
+  const matches = url.match(/^https?:\/\/([^/?#]+)(?:[/?#]|$)/i);
+  return matches && matches[1];
+}
 
 export default fp(corsAllowed);
