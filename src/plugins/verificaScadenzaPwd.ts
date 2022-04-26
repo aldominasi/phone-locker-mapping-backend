@@ -6,6 +6,7 @@ import { IQuerystringJwt } from './jwtHandler';
 import { ResponseApi } from '../models/ResponseApi';
 
 const DAYS = 90;
+const MINUTES = 20;
 enum Errore {
   GENERICO = 'ERR_PWD_1',
   INFO_UTENTE = 'ERR_PWD_2',
@@ -35,7 +36,9 @@ export default fp(async (server: FastifyInstance, options: FastifyPluginOptions)
       Controlla se l'ultima modifica della pwd coincide con la data di registrazione. Pertanto non è mai stata modificata (Primo Accesso)
       Inoltre controlla se sono passati più di 'DAYS' giorni dall'ultima modifica della password.
       */
-      if (ultimaModifica.hasSame(createdAt, 'minute') || DateTime.local().diff(ultimaModifica, 'days').days >= DAYS)
+      const giorniUltimaModifica = DateTime.local().diff(ultimaModifica, 'days').days;
+      const accountCreato = ultimaModifica.diff(createdAt, 'minutes').minutes;
+      if ((Math.abs(accountCreato) <= MINUTES) || giorniUltimaModifica >= DAYS)
         return reply.status(200).send(new ResponseApi(null, false, 'Il servizio non è al momento disponibile', Errore.PWD_SCADUTA));
     } catch (ex) {
       server.log.error(ex);
