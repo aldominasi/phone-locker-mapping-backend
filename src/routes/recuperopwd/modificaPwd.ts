@@ -8,6 +8,7 @@ import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
 import { IQuerystringJwt } from '../../plugins/jwtHandler';
 import { hash } from 'bcryptjs';
 import { DateTime } from 'luxon';
+import { GIORNI_VALIDITA_PWD } from '../../plugins/verificaScadenzaPwd';
 
 const regexPassword = /^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9]).{6,})\S$/;
 
@@ -56,7 +57,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       await utentiSchema.findByIdAndUpdate(tokenData.id, {
         $set: {
           password: nuovaPassword,
-          modPwdData: DateTime.local().toJSDate()
+          modPwdData: DateTime.local().plus({ days: GIORNI_VALIDITA_PWD }).toJSDate()
         }
       }).exec(); // Eseguo l'update della password
       return new ResponseApi('La password è stata modificata correttamente');

@@ -5,8 +5,7 @@ import { DateTime } from 'luxon';
 import { IQuerystringJwt } from './jwtHandler';
 import { ResponseApi } from '../models/ResponseApi';
 
-const DAYS = 90;
-const MINUTES = 20;
+export const GIORNI_VALIDITA_PWD = 90;
 enum Errore {
   GENERICO = 'ERR_PWD_1',
   INFO_UTENTE = 'ERR_PWD_2',
@@ -28,19 +27,14 @@ export default fp(async (server: FastifyInstance, options: FastifyPluginOptions)
       if (tokenData == null)
         return reply.status(200).send(new ResponseApi(null, false, 'Il servizio non è al momento disponibile', Errore.INFO_UTENTE));
       const utente = await utentiSchema.findById(tokenData?.id);
+      // Controlla che l'utente sia presente in piattaforma
       if (utente == null)
         return reply.status(200).send(new ResponseApi(null, false, 'Il servizio non è al momento disponibile', Errore.UTENTE_NON_TROVATO));
-      if (utente.modPwdData == null)
+      // Controlla che l'utente abbia cambiato la password almeno una volta
+      if (utente.pwdScaduta == null)
         return reply.status(200).send(new ResponseApi(null, false, 'Il servizio non è al momento disponibile', Errore.PWD_SCADUTA));
-      const ultimaModifica = DateTime.fromJSDate(utente.modPwdData);
-      const createdAt = DateTime.fromJSDate(utente.createdAt);
-      /*
-      Controlla se l'ultima modifica della pwd coincide con la data di registrazione. Pertanto non è mai stata modificata (Primo Accesso)
-      Inoltre controlla se sono passati più di 'DAYS' giorni dall'ultima modifica della password.
-      */
-      const giorniUltimaModifica = DateTime.local().diff(ultimaModifica, 'days').days;
-      const accountCreato = ultimaModifica.diff(createdAt, 'minutes').minutes;
-      if ((Math.abs(accountCreato) <= MINUTES) || giorniUltimaModifica >= DAYS)
+      // Controlla se la password è scaduta
+      if (DateTime.fromJSDate(utente.pwdScaduta).diffNow().milliseconds <= 0)
         return reply.status(200).send(new ResponseApi(null, false, 'Il servizio non è al momento disponibile', Errore.PWD_SCADUTA));
     } catch (ex) {
       server.log.error(ex);

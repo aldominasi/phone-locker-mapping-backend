@@ -1,7 +1,7 @@
 export default interface IUtenti {
   email: string;
   password: string;
-  modPwdData: Date | null;
+  pwdScaduta: Date | null;
   numeroCellulare: string;
   nome: string;
   cognome: string;

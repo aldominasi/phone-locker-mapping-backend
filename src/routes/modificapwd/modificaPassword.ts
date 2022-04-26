@@ -8,6 +8,7 @@ import IUtenti from '../../entities/utenti/utenti.interface';
 import utentiSchema from '../../entities/utenti/utenti.schema';
 import { hash, compare } from 'bcryptjs';
 import { DateTime } from 'luxon';
+import { GIORNI_VALIDITA_PWD } from '../../plugins/verificaScadenzaPwd';
 
 enum Errore {
   GENERICO = 'ERR_MOD_PWD_1',
@@ -59,7 +60,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       await utentiSchema.findByIdAndUpdate(tokenData.id, {
         $set: {
           password: nuovaPassword,
-          modPwdData: DateTime.local().toJSDate()
+          pwdScaduta: DateTime.local().plus({ days: GIORNI_VALIDITA_PWD }).toJSDate()
         }
       }).exec();
       return new ResponseApi('La password è stata modificata correttamente');

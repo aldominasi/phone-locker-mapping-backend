@@ -9,7 +9,7 @@ const utentiSchema = new Schema<IUtenti>({
     required: true,
     lowercase: true
   },
-  modPwdData: {
+  pwdScaduta: {
     type: Date,
     default: null
   },
