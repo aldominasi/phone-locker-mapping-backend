@@ -7,7 +7,8 @@ const utentiSchema = new Schema<IUtenti>({
   email: {
     type: String,
     validate: regexEmail,
-    required: true
+    required: true,
+    lowercase: true
   },
   modPwdData: {
     type: Date,
