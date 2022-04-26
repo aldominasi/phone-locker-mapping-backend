@@ -23,11 +23,13 @@ const utentiSchema = new Schema<IUtenti>({
   },
   nome: {
     type: String,
-    required: true
+    required: true,
+    uppercase: true
   },
   cognome: {
     type: String,
-    required: true
+    required: true,
+    uppercase: true
   },
   ruolo: {
     type: String,
