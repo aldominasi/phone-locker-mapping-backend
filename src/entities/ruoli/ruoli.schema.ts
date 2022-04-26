@@ -23,7 +23,8 @@ const permessiSchema = new Schema<IPermessi>({
 const ruoliSchema = new Schema<IRuoli>({
   _id: {
     type: String,
-    required: true
+    required: true,
+    uppercase: true
   },
   permessi: permessiSchema
 }, {
