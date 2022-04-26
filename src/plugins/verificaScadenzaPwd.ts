@@ -32,7 +32,7 @@ export default fp(async (server: FastifyInstance, options: FastifyPluginOptions)
       const ultimaModifica = DateTime.fromJSDate(utente.modPwdData);
       const createdAt = DateTime.fromJSDate(utente.createdAt);
       /*
-      Controlla se l'ultima modifica della pwd coincide con la data di registrazione registrazione. Pertanto non è mai stata modificata (Primo Accesso)
+      Controlla se l'ultima modifica della pwd coincide con la data di registrazione. Pertanto non è mai stata modificata (Primo Accesso)
       Inoltre controlla se sono passati più di 'DAYS' giorni dall'ultima modifica della password.
       */
       if (ultimaModifica.hasSame(createdAt, 'minute') || DateTime.local().diff(ultimaModifica, 'days').days >= DAYS)
