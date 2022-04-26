@@ -30,6 +30,8 @@ export default fp(async (server: FastifyInstance, options: FastifyPluginOptions)
       const utente = await utentiSchema.findById(tokenData?.id);
       if (utente == null)
         return reply.status(200).send(new ResponseApi(null, false, 'Il servizio non è al momento disponibile', Errore.UTENTE_NON_TROVATO));
+      if (utente.modPwdData == null)
+        return reply.status(200).send(new ResponseApi(null, false, 'Il servizio non è al momento disponibile', Errore.PWD_SCADUTA));
       const ultimaModifica = DateTime.fromJSDate(utente.modPwdData);
       const createdAt = DateTime.fromJSDate(utente.createdAt);
       /*

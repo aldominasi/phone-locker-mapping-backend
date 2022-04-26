@@ -1,7 +1,6 @@
 import { model, Schema } from 'mongoose';
 import IUtenti from './utenti.interface';
 import { regexEmail } from '../../utilities/defaultValue';
-import { DateTime } from 'luxon';
 
 const utentiSchema = new Schema<IUtenti>({
   email: {
@@ -12,7 +11,7 @@ const utentiSchema = new Schema<IUtenti>({
   },
   modPwdData: {
     type: Date,
-    default: DateTime.local().toUTC().toJSDate()
+    default: null
   },
   password: {
     type: String,
