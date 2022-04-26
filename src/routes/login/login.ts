@@ -39,7 +39,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
   }, async (request, reply): Promise<ResponseApi> => {
     try {
       const { email, password } = request.body; //Recupero l'email e la password inviate dal client
-      const utente = await utentiSchema.findOne({ email: email }).exec(); // Cerco l'utente utilizzando i dati ricevuti dal client
+      const utente = await utentiSchema.findOne({ email: email.toLowerCase() }).exec(); // Cerco l'utente utilizzando i dati ricevuti dal client
       if (utente == null) // Utente non trovato
         return new ResponseApi(null, false, 'Username o password non corretti', Errore.CREDENZIALI_ERRATE);
       const pwdIsCorrect: boolean = await compare(password, utente.password); // controllo se la password è corretta
