@@ -13,7 +13,7 @@ export const bodyVal = S.object()
   )
   .prop('tipoArmadio', S.string().required())
   .prop('indirizzo', S.string().required())
-  .prop('nota', S.string().required());
+  .prop('nota', S.string().default(''));
 
 export const queryVal = S.object()
   .prop('token', S.string().required());
