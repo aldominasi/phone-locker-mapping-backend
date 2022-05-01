@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
+import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import armadiSchema from '../../entities/armadi/armadi.schema';
 import comuniSchema from '../../entities/comuni/comuni.schema';
 import { IQuerystringJwt } from '../../plugins/jwtHandler';
