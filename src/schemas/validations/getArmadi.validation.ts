@@ -10,5 +10,6 @@ export const queryArmadi = S.object()
   .prop('token', S.string().required())
   .prop('codiceCentrale', S.string())
   .prop('zona', S.string())
+  .prop('codiceProvincia', S.string())
   .prop('page', S.integer().required())
   .prop('limit', S.integer().required());

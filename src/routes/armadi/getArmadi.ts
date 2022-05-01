@@ -25,13 +25,15 @@ interface IParams { // Interfaccia params della request
 interface IQuery extends IQuerystringJwt { // Interfaccia delle querystring della request
   page: number; // numero di pagina
   limit: number; // numero di item per pagina
-  codiceCentrale?: string; // filtro per la ricerca (nome della centrale)
-  zona?: string;
+  codiceCentrale?: string; // filtro per la ricerca (codice della centrale o comune)
+  zona?: string; // filtro pe rla ricerca (identificativo della zona)
+  codiceProvincia?: string; // filtro per la ricerca (codice della provincia)
 }
 
 interface IFiltroRicerca {
   'centrale.codice'?: string;
   'zona.info1'?: string;
+  'provincia.codice'?: string;
 }
 
 export default async (server: FastifyInstance, options: FastifyPluginOptions) => {
@@ -105,10 +107,12 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       if (!permesso)
         return new ResponseApi(null, false, 'Accesso non autorizzato', Errore.PERMESSI);
       const filtri: IFiltroRicerca = {};
-      if (request.query.codiceCentrale)
+      if (request.query.codiceCentrale) // Se presente il codice della centrale, aggiunge il relativo filtro alla ricerca
         filtri['centrale.codice'] = request.query.codiceCentrale;
-      if (request.query.zona)
+      if (request.query.zona) // Se presente la zona, aggiunge il relativo filtro alla ricerca
         filtri['zona.info1'] = request.query.zona;
+      if (request.query.codiceProvincia) // Se presente il codice della provincia, aggiunge il relativo filtro alla ricerca
+        filtri['provincia.codice'] = request.query.codiceProvincia;
       // Recupera la lista degli armadi secondo i parametri inviati dal client
       const armadi: IArmadi[] = await armadiSchema.find(filtri)
         .skip(request.query.page * request.query.limit)
