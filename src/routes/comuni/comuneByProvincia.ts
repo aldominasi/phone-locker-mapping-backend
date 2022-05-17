@@ -30,11 +30,11 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions): P
     try {
       const comuni = await comuniSchema.aggregate([
         { $match: { 'provincia.codice': request.query.codice } },
-        { $group: { _id: '$codice', nome: { $first: '$nome' } } },
+        { $group: { _id: '$codice', nome: { $first: '$nome' }, coordinate: { $first: '$coordinate' } } },
         { $sort: { nome: 1 } }
       ]).exec();
       return new ResponseApi(comuni.map(item => {
-        return { codice: item._id, nome: item.nome };
+        return { codice: item._id, nome: item.nome, coordinate: item.coordinate };
       }));
     } catch (ex) {
       server.log.error(ex);

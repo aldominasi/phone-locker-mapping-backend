@@ -17,4 +17,8 @@ export default interface IComuni {
   codiceCatastale: string; // Codice catastale del comune
   cap: string[]; // Codici di avviamento postale
   popolazione: number; // Numero della popolazione relativo al 2011
+  coordinate: {
+    lat: number;
+    lng: number;
+  }
 }

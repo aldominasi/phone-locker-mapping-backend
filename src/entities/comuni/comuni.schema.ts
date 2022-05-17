@@ -48,6 +48,14 @@ const comuniSchema: Schema = new Schema<IComuni>({
   popolazione: {
     type: Number,
     default: 0
+  },
+  coordinate: {
+    lat: {
+      type: Number
+    },
+    lng: {
+      type: Number
+    }
   }
 }, {
   timestamps: true
