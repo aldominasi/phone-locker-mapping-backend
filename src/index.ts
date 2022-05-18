@@ -1,7 +1,6 @@
 import { fastify } from 'fastify';
 import fastifyAutoload from 'fastify-autoload';
 import path from 'path';
-import basicAuth from './utilities/basicAuth';
 import Env from 'fastify-env';
 import envValidation from './schemas/validations/env.validation';
 import utentiSchema from './entities/utenti/utenti.schema';
@@ -29,7 +28,6 @@ const start = async (): Promise<void> => {
     await server.register(fastifyAutoload, {
       dir: path.join(__dirname, 'plugins')
     });
-    await server.register(import('fastify-basic-auth'), basicAuth);
     await server.register(fastifyAutoload, {
       dir: path.join(__dirname, 'routes'),
       dirNameRoutePrefix: true

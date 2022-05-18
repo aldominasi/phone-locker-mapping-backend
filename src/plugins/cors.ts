@@ -1,22 +1,25 @@
 import fp from 'fastify-plugin';
-import fastifyCors, { FastifyCorsOptions } from 'fastify-cors';
+import fastifyCors from 'fastify-cors';
 import { FastifyInstance, FastifyPluginAsync } from 'fastify';
+
+const originAllowed = [ 'phone-locker-mapping-pwa.vercel.app', '127.0.0.1', 'localhost' ];
 
 const corsAllowed: FastifyPluginAsync = async function (server: FastifyInstance) {
   try {
     server.register(fastifyCors, () => {
       return (req, cb) => {
-        let corsOptions: FastifyCorsOptions = { origin: false, credentials: false };
-        const origin: string | undefined = req.headers.origin;
-        if (origin == null) {
-          return cb(null, corsOptions);
+        if (process.env.DEVELOPMENT != null) {
+          cb(null, { origin: true });
         }
-        const hostname = new URL(origin).hostname;
-        if (process.env.DEVELOPMENT != null)
-          corsOptions = { origin: true };
-        else if (hostname === getHostNameFromRegex(process.env.HOST_PLM as string))
-          corsOptions = { origin: true };
-        cb(null, corsOptions);
+        else {
+          const origin: string | undefined = req.headers.origin;
+          if (origin != null) {
+            const hostname = new URL(origin).hostname;
+            if (originAllowed.includes(hostname))
+              return cb(null, { origin: true });
+          }
+          cb(new Error('Accesso non consentito'));
+        }
       };
     });
   } catch (ex) {
