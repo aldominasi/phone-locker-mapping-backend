@@ -1,40 +1,47 @@
 # Phone locker mapping
-Phone locker mapping è una soluzione software per le aziende che operano nel settore delle telecomunicazioni
-e che si occupano della manutenzione di reti fisse e mobili.
-La soluzione offre la digitalizzazione delle informazioni necessarie. Inoltre offre la possibilità agli
-operatori di lavorare in maniera smart utilizzando il proprio dispositivo.  
-La soluzione è divisa in due progetti: [front-end](https://github.com/aldominasi/phone-locker-mapping.pwa)
-e back-end (questo repository)
+Phone locker mapping is a software solution for telecoms companies and dealing with the maintenance
+of fixed and mobile network.
 
-## Come eseguire il progetto
+This idea was born out of the need to digitize the information required for the performance of operational
+activities and to enable employees to work quickly and easily.
 
-Per l'esecuzione del progetto in modalità development:
-- Scaricare o clonare il progetto
-- Creare le variabili d'ambiente come specificato nella sezione successiva (è possibile inserire le variabili anche nel file `.env` da creare nella cartella principale del progetto) 
-- Eseguire il comando `npm install` per installare i package necessari
-- Eseguire tramite terminale (dalla root del progetto) il comando `npm start`
+This solution is split into two projects: [front-end](https://github.com/aldominasi/phone-locker-mapping.pwa)
+and back-end (this repository)
 
-## Variabili d'ambiente
-`MONGO_INITDB_ROOT_USERNAME` username di accesso al db    
+# Quickstart
+1. Create an environment variables that specified in the next section (is possible insert the env variables in `.env` file inside the root dir)
+2. Install the required packages
+```bash
+npm install
+```
+3. Compile and run the project
+```bash
+npm start
+```
 
-`MONGO_INITDB_ROOT_PASSWORD` password di accesso al db   
+## Environment Variables
+`MONGO_INITDB_ROOT_USERNAME` username to access the database 
 
-`MONGO_INITDB_DATABASE` nome del db utilizzato dalla soluzione
+`MONGO_INITDB_ROOT_PASSWORD` password to access the database   
 
-`HOST_DB` host su cui risiede il db (es. 127.0.0.1)
+`MONGO_INITDB_DATABASE` name of database used to this project
 
-`AUTH_DB` nome del db su cui effettuare l'autenticazione
+`HOST_DB` host of database (ex. 127.0.0.1)
 
-`HOST_PLM` host o dominio del client
+`AUTH_DB` name of authentication database
 
-`PORT_PLM_BACKEND` porta di ascolto del progetto
+`HOST_PLM` host or domain of front-end project
 
-`SEED_JWT_TOKEN` chiave utilizzata per firmare il jsonwebtoken     
+`PORT_PLM_BACKEND` listening port
 
-`SALT_PWD` numero intero per cifrare la password
+`SEED_JWT_TOKEN` key used to sign the access token     
 
-`DEVELOPMENT=X` Da inserire come variabile nel caso in cui il db sia senza autenticazione e accettare tutte
-le connessioni indifferentemente dal client
+`SALT_PWD` integer for encrypt password
 
-# LICENZA
-Vedi la [licenza](https://github.com/aldominasi/phone-locker-mapping-backend/blob/main/LICENSE)
+`DEVELOPMENT=X` insert this variable in case the database is without authentication and accept the connections from any origin
+
+# Installation
+This project requires the installation of NodeJS, Npm and MongoDB
+
+# License
+All code is released under the [Apache 2.0](https://github.com/aldominasi/phone-locker-mapping-backend/blob/main/LICENSE) license
