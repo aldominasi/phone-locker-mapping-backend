@@ -10,11 +10,14 @@ and back-end (this repository)
 
 # Quickstart
 1. Create an environment variables that specified in the next section (is possible insert the env variables in `.env` file inside the root dir)
-2. Install the required packages
+2. Create a db `plmdb`
+3. Create two collections: `comunis` and `ruolis`
+4. Import `ruolis.json` into ruolis collection and `comunis` into comunis collection
+5. Install the required packages
 ```bash
 npm install
 ```
-3. Compile and run the project
+6. Compile and run the project
 ```bash
 npm start
 ```
