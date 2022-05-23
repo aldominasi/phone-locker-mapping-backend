@@ -11,29 +11,34 @@ and back-end (this repository)
 # Quickstart
 1. Create an environment variables that specified in the next section (is possible insert the env variables in `.env` file inside the root dir)
 2. Create a db `plmdb`
-3. Create two collections: `comunis` and `ruolis`
-4. Import `ruolis.json` into ruolis collection and `comunis` into comunis collection
-5. Install the required packages
+3. Import `ruolis.json` and `comunis.json` (the files are in the initCollections directory) with mongoimport, for example
+```bash
+mongoimport.exe --db plmdb --host=127.0.0.1:27017 --drop --file comunis.json --jsonArray 
+```
+4. Install the required packages
 ```bash
 npm install
 ```
-6. Compile and run the project
+5. Compile and run the project
 ```bash
 npm start
 ```
 
-## Environment Variables
-`MONGO_INITDB_ROOT_USERNAME` username to access the database 
+At the first time the software creates the administrator user with the following credentials.
+email = admin@admin.com and password = Cambiami1
 
-`MONGO_INITDB_ROOT_PASSWORD` password to access the database   
+## Environment Variables
+`MONGO_INITDB_ROOT_USERNAME` username to access the database (optional if DEVELOPMENT variable is undefined)
+
+`MONGO_INITDB_ROOT_PASSWORD` password to access the database (optional if DEVELOPMENT variable is undefined)
 
 `MONGO_INITDB_DATABASE` name of database used to this project
 
 `HOST_DB` host of database (ex. 127.0.0.1)
 
-`AUTH_DB` name of authentication database
+`AUTH_DB` name of authentication database (optional if DEVELOPMENT variable is undefined)
 
-`HOST_PLM` host or domain of front-end project
+`HOST_PLM` host or domain of front-end project (optional if DEVELOPMENT variable is undefined)
 
 `PORT_PLM_BACKEND` listening port
 
@@ -42,9 +47,6 @@ npm start
 `SALT_PWD` integer for encrypt password
 
 `DEVELOPMENT=X` insert this variable in case the database is without authentication and accept the connections from any origin
-
-At the first time the software creates the administrator user with the following credentials.
-email = admin@admin.com and password = Cambiami1
 
 # Installation
 This project requires the installation of NodeJS, Npm and MongoDB
