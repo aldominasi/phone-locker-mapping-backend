@@ -40,6 +40,9 @@ npm start
 
 `DEVELOPMENT=X` insert this variable in case the database is without authentication and accept the connections from any origin
 
+At the first time the software creates the administrator user with the following credentials.
+email = admin@admin.com and password = Cambiami1
+
 # Installation
 This project requires the installation of NodeJS, Npm and MongoDB
 
