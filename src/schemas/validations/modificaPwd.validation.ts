@@ -1,5 +1,5 @@
 import S from 'fluent-json-schema';
-const regexPassword = /^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9]).{6,})\S$/;
+import { regexPassword } from '../../utilities/defaultValue';
 
 export const bodyVal = S.object()
   .prop('oldPwd', S.string().required())

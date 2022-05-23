@@ -52,18 +52,19 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       const ruoloDaAssegnare: IRuoli | null = await ruoliSchema.findById(request.body.ruolo).exec(); // Controllo che il ruolo inviato sia valido
       if (ruoloDaAssegnare == null)
         return new ResponseApi(null, false, MSG_ERROR_DEFAULT, Errore.RUOLO_NON_TROVATO);
-      const pwd: string = server.createPwd(6, true, false); // Genera in maniera pseudo-casuale la password da inviare per email
-      request.body.password = await hash(pwd, parseInt(process.env.SALT_PWD ?? '8')); // Esegue l'encrypt della password per salvare nel db
+      //const pwd: string = server.createPwd(6, true, false); // Genera in maniera pseudo-casuale la password da inviare per email
+      request.body.password = await hash(request.body.password, parseInt(process.env.SALT_PWD ?? '8')); // Esegue l'encrypt della password per salvare nel db
       const utente: IUtenti = {
         ...request.body,
         ruolo: request.body.ruolo
       };
       const utenteCreato = await utentiSchema.create(utente); // Crea l'utente
+      /*
       await server.mailer.sendMail({ // Invia l'email di avvenuta registrazione all'indirizzo email presente nel payload della richiesta
         to: utenteCreato.email,
         subject: 'Nuovo account Plm',
         text: `E' stato creato un nuovo account. La tua password per accedere ai servizi Plm è ${pwd}\nTi invitiamo a cambiarla`
-      });
+      });*/
       return new ResponseApi(utenteCreato); // Risposta inviata al client
     } catch (ex) {
       server.log.error(ex);
