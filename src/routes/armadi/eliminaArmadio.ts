@@ -4,6 +4,7 @@ import { IQuerystringJwt } from '../../plugins/jwtHandler';
 import S from 'fluent-json-schema';
 import { ResponseApi } from '../../models/ResponseApi';
 import { MSG_ERROR_DEFAULT } from '../../utilities/defaultValue';
+import ResponseApiSerialization from "../../schemas/serializations/responseApi.serialization";
 
 enum Errore {
   GENERICO = 'ERR_DEL_ARM_1',
@@ -29,7 +30,11 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       version: '1.0.0'
     },
     schema: {
-      params: S.object().prop('id', S.string().required())
+      params: S.object().prop('id', S.string().required()),
+      response: {
+        '200': ResponseApiSerialization.prop('data', S.null()),
+        '204': S.null()
+      }
     },
     onRequest: [server.verifyAuth, server.verificaPwdScaduta]
   }, async (request, reply) => {
@@ -40,8 +45,8 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       const permesso: boolean = await server.verificaPermessi(tokenData.id, 'writeArmadi'); // Verifica i permessi dell'utente
       if (!permesso)
         return new ResponseApi(null, false, 'Accesso non autorizzato', Errore.PERMESSI);
-      const result = await armadiSchema.findByIdAndDelete(request.params.id);
-      return new ResponseApi(result);
+      await armadiSchema.findByIdAndDelete(request.params.id);
+      return await reply.code(204).send();
     } catch (ex) {
       server.log.error(ex);
       return new ResponseApi(null, false, MSG_ERROR_DEFAULT, Errore.GENERICO);
