@@ -20,7 +20,9 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
   /*
   REST API per eliminare un armadio
   Codici di errore:
-
+  ERR_DEL_ARM_1 - Errore generico
+  ERR_DEL_ARM_2 - Errore nel recupero delle informazioni presenti nel token
+  ERR_DEL_ARM_3 - L'utente non ha il permesso di accedere all'API
    */
   server.delete<{
     Querystring: IQuerystringJwt,

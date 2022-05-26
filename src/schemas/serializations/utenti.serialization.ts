@@ -9,6 +9,7 @@ export default ResponseApiSerialization
     .prop('utenti',
       S.array().items(
         S.object()
+          .prop('_id', S.string())
           .prop('email', S.string())
           .prop('password', S.string())
           .prop('numeroCellulare', S.string())

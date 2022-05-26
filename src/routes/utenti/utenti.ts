@@ -61,7 +61,7 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
       if (request.query.ruolo != null)
         query.ruolo = request.query.ruolo;
       const utenti: IUtenti[] = await utentiSchema.find(query, {
-        _id: 0, password: 0, modPwdData: 0
+        password: 0, modPwdData: 0
       })
         .skip(request.query.page * request.query.limit)
         .limit(request.query.limit)
