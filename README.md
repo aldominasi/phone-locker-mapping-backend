@@ -38,7 +38,7 @@ email = admin@admin.com and password = Cambiami1
 
 `AUTH_DB` name of authentication database (optional if DEVELOPMENT variable is undefined)
 
-`HOST_PLM` host or domain of front-end project (optional if DEVELOPMENT variable is undefined)
+`HOST_PLM` host or domain of front-end project (example HTTP://127.0.0.1:8080)
 
 `PORT_PLM_BACKEND` listening port
 

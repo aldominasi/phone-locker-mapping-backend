@@ -13,11 +13,12 @@ export default fp(async (server: FastifyInstance, options: FastifyPluginOptions)
     server.register(require('fastify-mailer'), {
       defaults: { from: 'assistenza plm <assistenza@plm.tld>' },
       transport: {
-        host: 'smtp.mailtrap.io',
-        port: 2525,
+        service: '"SendGrid"',
+        //host: 'smtp.mailtrap.io',
+        //port: 2525,
         auth: {
-          user: 'd93b5c35920087',
-          pass: '981bd7d195239c'
+          user: 'apikey',
+          pass: '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'
         }
       }
     });

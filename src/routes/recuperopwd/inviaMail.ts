@@ -40,9 +40,10 @@ export default async (server: FastifyInstance, options: FastifyPluginOptions) =>
         return new ResponseApi(null, false, 'Si è verificato un errore. Riprova più tardi', Errore.UTENTE_NON_TROVATO);
       const tokenUtente = await server.signAuth({ id: utente._id.toString() }, 1200); // Firma il token per 20 minuti
       await server.mailer.sendMail({ // Invia una mail contenente l'url per modificare la password
+        from: 'aldo.minasi@gmail.com',
         to: request.body.email,
         subject: 'Recupero Password Plm',
-        html: `<p>Vai al seguente link per modificare la password <a href="${process.env.HOST_PLM}:8080/plm/#/pwdLost?tkn=${tokenUtente}">${process.env.HOST_PLM}</a></p>`
+        html: `Vai al seguente link per modificare la password <a href="${process.env.HOST_PLM}/plm/#/pwdLost?tkn=${tokenUtente}">${process.env.HOST_PLM}</a>`
       });
       return new ResponseApi('A breve riceverai una mail contenente le informazioni per recuperare la password.');
     } catch (ex) {
